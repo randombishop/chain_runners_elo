@@ -1,0 +1,14 @@
+# mac stufff
+.DS_Store
+
+# The cache for chain data in container
+.local
+
+# exclude PyCharm metadata
+.idea
+
+
+
+
+
+
