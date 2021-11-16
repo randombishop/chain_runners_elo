@@ -12,6 +12,10 @@ body, html {
   background-size: cover;
 }
 
+.my-green {
+    color: #00ff54;
+}
+
 .navbar-box {
     text-align:center;
     line-height:80px
@@ -22,6 +26,12 @@ body, html {
     height: 100px;
     width: 200px;
     padding-left: 40px;
+}
+
+.navbar-button {
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
 }
 
 .h1a {
@@ -127,11 +137,36 @@ body, html {
     padding: 10px;
 }
 
-.ranking-panel-action {
+.ranking-panel-info {
     position: absolute;
     left: 20px;
+    bottom: 20px;
+    width: 300px;
+    height: 60px;
+    font-size: small;
+}
+
+.ranking-panel-action {
+    position: absolute;
     right: 20px;
     bottom: 20px;
+    width: 200px;
     height: 60px;
-    text-align: center
+    text-align: center;
+}
+
+.ranking-table-row {
+    line-height: 45px;
+    font-size: 18px;
+}
+
+.ranking-table-important {
+    color: #00ff54;
+    font-weight: bold;
+    font-size: 36px;
+}
+
+.ranking-table-row img {
+    display:table-cell;
+    vertical-align:middle;
 }

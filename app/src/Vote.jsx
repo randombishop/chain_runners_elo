@@ -1,8 +1,10 @@
 import React, { Component } from 'react' ;
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 
 
 import Runner from './Runner' ;
+
 
 class Vote extends Component {
 
@@ -49,6 +51,11 @@ class Vote extends Component {
                 </Grid>
                 <Grid item xs={2} style={{textAlign:'center', marginTop:'150px'}}>
                     <img src="versus.png"  alt="versus" width="200px" height="200px"/>
+                    <br/>
+                    <Button size="large" variant="contained"
+                            style={{fontWeight:'bold'}}>
+                        DRAW!
+                    </Button>
                 </Grid>
                 <Grid item xs={5} >
                     <Runner data={this.state.runner2}/>

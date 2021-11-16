@@ -9,6 +9,14 @@ class NavBar extends Component {
 
     }
 
+    renderAddress = () => {
+        if (this.props.address) {
+            return this.props.address.substr(0,6)+'...' ;
+        } else {
+            return "" ;
+        }
+    }
+
     render() {
         return (
             <Grid container spacing={3} style={{height:'120px', padding:'10px', backgroundColor:'rgba(32, 64, 32, 0.6)'}}>
@@ -24,16 +32,22 @@ class NavBar extends Component {
                 </Grid>
                 <Grid item xs={5} className="navbar-box">
                     <Button size="large" variant="contained" color="primary" onClick={this.props.navigate('vote')}>
-                        Vote
+                        <span className="navbar-button">Vote</span>
                     </Button>
                     &nbsp;&nbsp;&nbsp;
                     <Button  size="large" variant="contained" color="primary" onClick={this.props.navigate('ranking')}>
-                        Ranking
+                        <span className="navbar-button">Ranking</span>
                     </Button>
                 </Grid>
                 <Grid item xs={2} className="navbar-box">
-                    <Button size="large" variant="contained" onClick={this.connect}>
-                        Connect
+                    <Button size="large"
+                            variant="contained"
+                            color="secondary"
+                            onClick={this.props.connect}
+                            disabled={this.props.address!=null}>
+                        <span className="navbar-button">
+                        {this.props.address==null?'Connect':this.renderAddress()}
+                        </span>
                     </Button>
                 </Grid>
             </Grid>

@@ -3,10 +3,13 @@ import { createTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { green } from '@material-ui/core/colors';
 import Container from '@material-ui/core/Container' ;
+import { ethers } from "ethers";
+
 
 import NavBar from './NavBar' ;
 import Vote from './Vote' ;
 import Ranking from './Ranking' ;
+
 
 const theme = createTheme({
   typography: {
@@ -20,13 +23,15 @@ const theme = createTheme({
 
 const BACKEND_URL = "http://localhost:3001" ;
 
+
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
         page: 'vote',
-        ranking: null
+        ranking: null,
+        address: null
     }
   }
 
@@ -50,6 +55,19 @@ class App extends Component {
     this.setState({ranking:result}) ;
   }
 
+  connect = () => {
+        let self = this ;
+        self.provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        self.provider.send("eth_requestAccounts", []).then(() => {
+            self.signer = self.provider.getSigner() ;
+            self.signer.getAddress().then((address) => {
+                self.setState({address:address}) ;
+            }).catch((error) => {
+                alert(error) ;
+            }) ;
+        });
+  }
+
   navigate = (page) => () => {
     this.setState({page:page}) ;
   }
@@ -66,7 +84,9 @@ class App extends Component {
     return (
       <ThemeProvider theme={theme}>
          <div>
-            <NavBar navigate={this.navigate}/>
+            <NavBar navigate={this.navigate}
+                    address={this.state.address}
+                    connect={this.connect} />
             <Container style={{marginTop:'25px'}}>
                 {this.renderPage()}
             </Container>

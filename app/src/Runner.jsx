@@ -40,7 +40,7 @@ class Runner extends Component {
                     {this.props.data?this.props.data.name:""}
                 </div>
                 <div className="vote-panel-avatar">
-                    <RollingImage data={this.props.data} />
+                    <RollingImage data={this.props.data?this.props.data.ids:[]} size={100}/>
                 </div>
                 <div className="vote-panel-text">
                     <span style={{whiteSpace: 'pre-wrap'}}>

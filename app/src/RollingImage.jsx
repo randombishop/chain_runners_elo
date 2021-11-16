@@ -34,12 +34,12 @@ class RollingImage extends Component {
     }
 
     roll = () => {
-        if (this.props.data) {
-            let n = this.props.data.ids.length ;
+        if (this.props.data && this.props.data.length>0) {
+            let n = this.props.data.length ;
             let counter = (this.state.counter+1)%n ;
             let state = {
                 counter: counter,
-                current: BASE_URL+this.props.data.ids[counter]
+                current: BASE_URL+this.props.data[counter]
             }
             this.setState(state) ;
         } else {
@@ -50,16 +50,8 @@ class RollingImage extends Component {
         }
     }
 
-    getUrl() {
-        if (this.props.data) {
-            return '#'+this.props.data.ids.join("+")
-        } else {
-            return 'Loading...' ;
-        }
-    }
-
     render() {
-        return (<img src={this.state.current} width="100" height="100" alt="avatar"/>) ;
+        return (<img src={this.state.current} width={this.props.size} height={this.props.size}  alt="avatar"/>) ;
     }
 
 }
