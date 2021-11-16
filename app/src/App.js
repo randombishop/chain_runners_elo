@@ -33,6 +33,8 @@ class App extends Component {
         page: 'vote',
         ranking: null,
         address: null,
+        runner1: null,
+        runner2: null,
         voted:false,
         winner:0
     }
@@ -109,8 +111,30 @@ class App extends Component {
   }
 
   vote = (winner) => () => {
-    alert(winner) ;
-    this.setState({voted:true,winner:winner}) ;
+    let self=this;
+    let data = {
+        address: this.state.address,
+        runner1: this.state.runner1.id,
+        runner2: this.state.runner2.id,
+        result: winner
+    } ;
+    fetch(BACKEND_URL+'/submit_vote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+       }).then(response => response.json())
+          .then(result => {self.voted(winner,result);})
+          .catch((error) => {alert('Error:', error);});
+  }
+
+  voted = (winner, result) => {
+    if (result.status==='ok') {
+        this.setState({voted:true,winner:winner}) ;
+    } else {
+        alert(result.status) ;
+    }
   }
 
   renderPage() {

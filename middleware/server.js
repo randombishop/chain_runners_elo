@@ -21,8 +21,9 @@ fastify.register(require('fastify-static'), {
 
 // Return current ratings
 fastify.get('/ranking', async (request, reply) => {
+    var q = 'SELECT * from elo.runner inner join elo.rating on runner.id=rating.runner_id  order by rating desc;' ;
     client
-        .query('SELECT * from elo.runner inner join elo.rating on runner.id=rating.runner_id  order by rating desc;')
+        .query(q)
         .then(res => {reply.send(res.rows)})
         .catch(e => {
             console.error(e.stack);
@@ -32,12 +33,23 @@ fastify.get('/ranking', async (request, reply) => {
 
 // Declare our json handling route
 fastify.post('/submit_vote', async (request, reply) => {
-    console.log('submit_vote') ;
+    var q = 'INSERT INTO elo.vote(address, runner1, runner2, result) VALUES($1, $2, $3, $4) ;' ;
     var data = request.body ;
+    var address = data.address ;
+    if (address==null) {
+        address="anon" ;
+    }
     var runner1 = data.runner1 ;
     var runner2 = data.runner2 ;
-    var outcome = data.outcome ;
-    reply.send({status:'ok'}) ;
+    var result = data.result ;
+    var params = [address, runner1, runner2, result] ;
+    client
+        .query(q, params)
+        .then(res => {reply.send({status:'ok'}) ;})
+        .catch(e => {
+            console.error(e.stack);
+            reply.send({status:'error'}) ;
+        })
 }) ;
 
 // Run the server!
