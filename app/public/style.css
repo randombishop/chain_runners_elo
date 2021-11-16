@@ -12,6 +12,30 @@ body, html {
   background-size: cover;
 }
 
+.navbar-box {
+    text-align:center;
+    line-height:80px
+}
+
+.navbar-title {
+    background-color: rgba(16,32,16,0.5);
+    height: 100px;
+    width: 200px;
+    padding-left: 40px;
+}
+
+.h1a {
+    font-size:24px;
+    color: #00ff54;
+    font-weight: bold;
+}
+
+.h1b {
+    font-size:20px;
+    color: white;
+    font-weight: bold;
+}
+
 .vote-panel {
   position: relative;
   background-image: url("panel2.png");
@@ -64,6 +88,46 @@ body, html {
 }
 
 .vote-panel-action {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    height: 60px;
+    text-align: center
+}
+
+
+.ranking-panel {
+  position: relative;
+  background-image: url("panel3.png");
+  background-size: 850px 700px;
+  width: 850px;
+  height: 700px;
+  margin-top: 50px;
+  margin-inline:auto;
+}
+
+.ranking-panel-title {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    line-height: 25px;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+.ranking-panel-table {
+    position: absolute;
+    left: 20px;
+    top: 70px;
+    width: 790px;
+    height: 500px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+.ranking-panel-action {
     position: absolute;
     left: 20px;
     right: 20px;

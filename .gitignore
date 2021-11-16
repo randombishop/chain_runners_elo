@@ -7,6 +7,11 @@
 # exclude PyCharm metadata
 .idea
 
+# Node libs and package lock files
+node_modules
+package-lock.json
+
+
 
 
 

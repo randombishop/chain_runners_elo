@@ -6,6 +6,7 @@ import Container from '@material-ui/core/Container' ;
 
 import NavBar from './NavBar' ;
 import Vote from './Vote' ;
+import Ranking from './Ranking' ;
 
 const theme = createTheme({
   typography: {
@@ -17,17 +18,55 @@ const theme = createTheme({
 });
 
 
+const BACKEND_URL = "http://localhost:3001" ;
+
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+        page: 'vote',
+        ranking: null
+    }
+  }
+
+  componentDidMount = () => {
+    this.loadRanking() ;
+  }
+
+  loadRanking = () => {
+       let self = this ;
+       fetch(BACKEND_URL+'/ranking', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+       }).then(response => response.json())
+          .then(result => {self.receiveRanking(result);})
+          .catch((error) => {alert('Error:', error);});
+  }
+
+  receiveRanking = (result) => {
+    this.setState({ranking:result}) ;
+  }
+
+  navigate = (page) => () => {
+    this.setState({page:page}) ;
+  }
+
   renderPage() {
-    return <Vote />
+    switch (this.state.page) {
+        case 'vote': return <Vote /> ;
+        case 'ranking': return <Ranking data={this.state.ranking} /> ;
+        default: return "" ;
+    }
   }
 
   render() {
     return (
       <ThemeProvider theme={theme}>
          <div>
-            <NavBar />
+            <NavBar navigate={this.navigate}/>
             <Container style={{marginTop:'25px'}}>
                 {this.renderPage()}
             </Container>
