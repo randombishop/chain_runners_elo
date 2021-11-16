@@ -52,8 +52,19 @@ body, html {
   background-size: 450px 700px;
   width: 450px;
   height: 700px;
-  margin-top: 50px;
   margin-inline:auto;
+}
+
+.vote-panel-draw {
+  margin-top: 60px;
+}
+
+.vote-panel-winner {
+  margin-top: 30px;
+}
+
+.vote-panel-looser {
+  margin-top: 90px;
 }
 
 .vote-panel-title {
@@ -106,6 +117,15 @@ body, html {
     text-align: center
 }
 
+.vote-img-result {
+    width:200px;
+    height:200px
+}
+
+.vote-txt-result {
+    font-size:40px;
+    font-weight: bold;
+}
 
 .ranking-panel {
   position: relative;

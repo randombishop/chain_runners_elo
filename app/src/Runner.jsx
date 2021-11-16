@@ -14,15 +14,13 @@ class Runner extends Component {
         }
     }
 
-    vote() {
-
-    }
-
     renderButton() {
         if (this.props.data) {
             return (<Button size="large" variant="contained"
-                            color="primary" onClick={this.vote}
-                            style={{fontWeight:'bold'}}>
+                            color="primary"
+                            onClick={this.props.vote}
+                            style={{fontWeight:'bold'}}
+                            disabled={this.props.voted}>
                         {this.props.data.name} WINS!
                     </Button>) ;
         } else {
@@ -30,9 +28,20 @@ class Runner extends Component {
         }
     }
 
+    additionalClass() {
+        if (this.props.isWinner) {
+            return "vote-panel-winner" ;
+        } else if (this.props.isLooser) {
+            return "vote-panel-looser" ;
+        } else {
+            return "vote-panel-draw" ;
+        }
+
+    }
+
     render() {
         return (
-            <div className="vote-panel" >
+            <div className={"vote-panel "+this.additionalClass()} >
                 <div className="vote-panel-title">
                     {this.getTitle()}
                 </div>

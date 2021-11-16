@@ -32,16 +32,6 @@ class Ranking extends Component {
 
     updatePagination = () => {
         if (this.props.data) {
-            this.props.data.sort((a,b) => a.rating - b.rating) ;
-            let rank = 0 ;
-            let currentRating = null ;
-            for (let i=0 ; i<this.props.data.length ; i++) {
-                if (currentRating==null || currentRating>this.props.data[i].rating) {
-                    rank++ ;
-                }
-                this.props.data[i].rank = rank ;
-                currentRating = this.props.data[i].rating ;
-            }
             let n = this.props.data.length ;
             let numPages = Math.ceil(n/NUM_ITEMS_PER_PAGE) ;
             this.setState({

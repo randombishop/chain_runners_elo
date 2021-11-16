@@ -22,6 +22,7 @@ const theme = createTheme({
 
 
 const BACKEND_URL = "http://localhost:3001" ;
+const MAX_OFFSET = 100 ;
 
 
 class App extends Component {
@@ -31,7 +32,9 @@ class App extends Component {
     this.state = {
         page: 'vote',
         ranking: null,
-        address: null
+        address: null,
+        voted:false,
+        winner:0
     }
   }
 
@@ -52,7 +55,40 @@ class App extends Component {
   }
 
   receiveRanking = (result) => {
-    this.setState({ranking:result}) ;
+    result.sort((a,b) => a.rating - b.rating) ;
+    let rank = 0 ;
+    let currentRating = null ;
+    for (let i=0 ; i<result.length ; i++) {
+        if (currentRating==null || currentRating>result[i].rating) {
+            rank++ ;
+        }
+        result[i].rank = rank ;
+        currentRating = result[i].rating ;
+    }
+    this.setState({ranking:result}, this.pickRunners) ;
+  }
+
+  pickRunners = () => {
+    if (this.state.ranking==null) {
+        return ;
+    }
+    let n = this.state.ranking.length ;
+    console.log('n', n) ;
+    let random1 = Math.floor(Math.random() * n);
+    let direction =  (Math.random()>0.5)?1:(-1) ;
+    let offset = Math.floor(Math.random() * MAX_OFFSET);
+    let random2 = (random1 + (direction*offset));
+    random2 = Math.abs(random2)%n ;
+    if (random1===random2) {
+        random2 = (random1 + direction)%n ;
+    }
+    let state = {
+        voted:false,
+        winner:0,
+        runner1: this.state.ranking[random1],
+        runner2: this.state.ranking[random2]
+    }
+    this.setState(state) ;
   }
 
   connect = () => {
@@ -72,9 +108,20 @@ class App extends Component {
     this.setState({page:page}) ;
   }
 
+  vote = (winner) => () => {
+    alert(winner) ;
+    this.setState({voted:true,winner:winner}) ;
+  }
+
   renderPage() {
     switch (this.state.page) {
-        case 'vote': return <Vote /> ;
+        case 'vote': return <Vote runner1={this.state.runner1}
+                                  runner2={this.state.runner2}
+                                  vote={this.vote}
+                                  voted={this.state.voted}
+                                  winner={this.state.winner}
+                                  next={this.pickRunners}
+                            /> ;
         case 'ranking': return <Ranking data={this.state.ranking} /> ;
         default: return "" ;
     }
