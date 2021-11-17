@@ -21,7 +21,7 @@ const theme = createTheme({
 });
 
 
-const BACKEND_URL = "" ;
+const BACKEND_URL = "" ; //"http://localhost:3001" ;
 const MAX_OFFSET = 100 ;
 
 
@@ -32,6 +32,7 @@ class App extends Component {
     this.state = {
         page: 'vote',
         ranking: null,
+        lastUpdateTimestamp: null,
         address: null,
         runner1: null,
         runner2: null,
@@ -42,6 +43,7 @@ class App extends Component {
 
   componentDidMount = () => {
     this.loadRanking() ;
+    this.loadLastUpdateTimestamp() ;
   }
 
   loadRanking = () => {
@@ -55,9 +57,21 @@ class App extends Component {
           .then(result => {self.receiveRanking(result);})
           .catch((error) => {alert('Error:', error);});
   }
+  loadLastUpdateTimestamp = () => {
+       let self = this ;
+       fetch(BACKEND_URL+'/last_update_timestamp', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+       }).then(response => response.json())
+          .then(result => {self.setState({lastUpdateTimestamp:result});})
+          .catch((error) => {alert('Error:', error);});
+  }
+
 
   receiveRanking = (result) => {
-    result.sort((a,b) => a.rating - b.rating) ;
+    result.sort((a,b) => b.rating - a.rating) ;
     let rank = 0 ;
     let currentRating = null ;
     for (let i=0 ; i<result.length ; i++) {
@@ -146,7 +160,9 @@ class App extends Component {
                                   winner={this.state.winner}
                                   next={this.pickRunners}
                             /> ;
-        case 'ranking': return <Ranking data={this.state.ranking} /> ;
+        case 'ranking': return <Ranking data={this.state.ranking}
+                                        lastUpdateTimestamp={this.state.lastUpdateTimestamp}
+                                /> ;
         default: return "" ;
     }
   }

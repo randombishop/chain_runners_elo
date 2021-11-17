@@ -106,20 +106,21 @@ class Vote extends Component {
 
     render() {
         return (
-            <Grid container spacing={0}>
-                <Grid item xs={5} >
+            <Grid container spacing={1}>
+                <Grid item lg={5} sm={12}>
                     <Runner data={this.state.runner1}
                             vote={this.props.vote(1)}
                             voted={this.props.voted}
                             isWinner={this.props.winner===1}
                             isLooser={this.props.winner===2} />
                 </Grid>
-                <Grid item xs={2} style={{textAlign:'center', marginTop:'150px'}}>
+                <Grid item lg={2} sm={12}
+                      style={{textAlign:'center', paddingTop:'150px'}}>
                     {this.renderVersus()}
                     <br/><br/><br/>
                     {this.renderNext()}
                 </Grid>
-                <Grid item xs={5} >
+                <Grid item lg={5} sm={12}>
                     <Runner data={this.state.runner2}
                             vote={this.props.vote(2)}
                             voted={this.props.voted}

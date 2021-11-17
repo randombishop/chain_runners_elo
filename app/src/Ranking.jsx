@@ -88,10 +88,10 @@ class Ranking extends Component {
             let list = this.props.data.slice(indexFrom, indexTo) ;
             return (<table style={{width:'100%'}}>
                         <thead>
-                          <tr>
-                            <th align="right">Rank</th>
-                            <th align="center">Runner</th>
-                            <th align="left">Name</th>
+                          <tr style={{lineHeight:'20px'}}>
+                            <th align="right"> </th>
+                            <th align="center"> </th>
+                            <th align="left"> </th>
                             <th align="center">Rating</th>
                             <th align="center">Won</th>
                             <th align="center">Draw</th>
@@ -145,8 +145,8 @@ class Ranking extends Component {
                     {this.renderList()}
                 </div>
                 <div className="ranking-panel-info">
-                    Last updated: <span className="my-green"><strong>N/A</strong></span><br/>
-                    This table will be updated when we reach a few hundreds votes...
+                    Last updated: <span className="my-green"><strong>{this.props.lastUpdateTimestamp}</strong></span><br/>
+                    (This is still a prototype, final algorithm still being worked on...)
                 </div>
                 <div className="ranking-panel-action">
                     {this.renderButtons()}

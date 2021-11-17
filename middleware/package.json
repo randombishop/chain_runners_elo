@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "elo-calculator": "^1.0.1",
     "fastify": "^3.22.1",
     "fastify-cors": "^6.0.2",
     "fastify-static": "^4.4.2",

@@ -1,7 +1,6 @@
 const fastify = require('fastify')({ logger: true })
 const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs');
+
 
 // Add cors allow
 fastify.register(require('fastify-cors'), {}) ;
@@ -25,6 +24,18 @@ fastify.get('/ranking', async (request, reply) => {
     client
         .query(q)
         .then(res => {reply.send(res.rows)})
+        .catch(e => {
+            console.error(e.stack);
+            reply.send({status:'error'}) ;
+        })
+}) ;
+
+// Return last update timestamp
+fastify.get('/last_update_timestamp', async (request, reply) => {
+    var q = 'SELECT max(last_vote) from elo.elo_batch ;' ;
+    client
+        .query(q)
+        .then(res => {reply.send(res.rows[0].max)})
         .catch(e => {
             console.error(e.stack);
             reply.send({status:'error'}) ;

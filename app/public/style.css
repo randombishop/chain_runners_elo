@@ -1,15 +1,10 @@
-body, html {
-  height: 100%;
-}
-
 #root {
   color: white;
-  height: 100%;
   font-family: monospace;
   background-image: url("background.jpeg");
-  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  padding-bottom: 125px
 }
 
 .my-green {
@@ -130,8 +125,8 @@ body, html {
 .ranking-panel {
   position: relative;
   background-image: url("panel3.png");
-  background-size: 850px 700px;
-  width: 850px;
+  background-size: 750px 700px;
+  width: 750px;
   height: 700px;
   margin-top: 50px;
   margin-inline:auto;
@@ -150,7 +145,7 @@ body, html {
     position: absolute;
     left: 20px;
     top: 70px;
-    width: 790px;
+    width: 700px;
     height: 500px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -176,8 +171,16 @@ body, html {
 }
 
 .ranking-table-row {
-    line-height: 45px;
+    line-height: 43px;
     font-size: 18px;
+}
+
+.ranking-panel-table th {
+    border-bottom: 2px solid #0e283a;
+}
+
+.ranking-panel-table td {
+    border-bottom: 2px solid #0e283a;
 }
 
 .ranking-table-important {
