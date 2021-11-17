@@ -20,7 +20,7 @@ fastify.register(require('fastify-static'), {
 
 // Return current ratings
 fastify.get('/ranking', async (request, reply) => {
-    var q = 'SELECT * from elo.runner inner join elo.rating on runner.id=rating.runner_id  order by rating desc;' ;
+    var q = 'SELECT * from elo.runner left join elo.rating on runner.id=rating.runner_id  order by rating desc;' ;
     client
         .query(q)
         .then(res => {reply.send(res.rows)})
