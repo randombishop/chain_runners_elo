@@ -3,6 +3,9 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 
+import RollingImage from './RollingImage' ;
+
+
 class NavBar extends Component {
 
     connect = () => {
@@ -19,18 +22,16 @@ class NavBar extends Component {
 
     render() {
         return (
-            <Grid container spacing={3} style={{height:'120px', padding:'10px', backgroundColor:'rgba(32, 64, 32, 0.6)'}}>
-                <Grid item xs={2}>
-                    <div className="navbar-title">
-                        <span className="h1a">ELO</span><br/>
-                        <span className="h1a">R</span><span className="h1b">ating</span><br/>
-                        <span className="h1a">S</span><span className="h1b">ystem</span>
-                    </div>
+            <Grid container spacing={3} className="navbar-grid">
+                <Grid item sm={12} lg={6} className="navbar-box">
+                    <img src="chain_runners_logo.svg" alt="Logo" height="60"/><br/>
+                    <span className="h1a">ELO</span>&nbsp;
+                    <span className="h1a">R</span><span className="h1b">ating</span>&nbsp;
+                    <span className="h1a">S</span><span className="h1b">ystem</span>
                 </Grid>
-                <Grid item xs={3} className="navbar-box">
-                    <img src="chain_runners_logo.svg" alt="Logo" height="80"/>
-                </Grid>
-                <Grid item xs={5} className="navbar-box">
+                <Grid item sm={12} lg={6} className="navbar-box">
+                    <br/>
+                    <br/>
                     <Button size="large" variant="contained" color="primary" onClick={this.props.navigate('vote')}>
                         <span className="navbar-button">Vote</span>
                     </Button>
@@ -38,8 +39,7 @@ class NavBar extends Component {
                     <Button  size="large" variant="contained" color="primary" onClick={this.props.navigate('ranking')}>
                         <span className="navbar-button">Ranking</span>
                     </Button>
-                </Grid>
-                <Grid item xs={2} className="navbar-box">
+                    &nbsp;&nbsp;&nbsp;
                     <Button size="large"
                             variant="contained"
                             color="secondary"
@@ -47,6 +47,8 @@ class NavBar extends Component {
                             disabled={this.props.address!=null}>
                         <span className="navbar-button">
                         {this.props.address==null?'Connect':this.renderAddress()}
+                        &nbsp;
+                        <RollingImage data={this.props.ownedRunners} size={28}/>
                         </span>
                     </Button>
                 </Grid>

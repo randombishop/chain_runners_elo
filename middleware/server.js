@@ -30,6 +30,25 @@ fastify.get('/ranking', async (request, reply) => {
         })
 }) ;
 
+// Return match history
+fastify.get('/runner_history/:runnerId', async (request, reply) => {
+    var q = 'select v.address, v.time, r1.name as runner1, r2.name as runner2, v.result ';
+        q+= 'from elo.vote as v ' ;
+        q+= 'inner join elo.runner as r1 on r1.id=v.runner1  ' ;
+        q+= 'inner join elo.runner as r2 on r2.id=v.runner2 ' ;
+        q+= 'where v.runner1=$1 or v.runner2=$1 ;' ;
+    var runnerId = request.params.runnerId ;
+    client
+        .query(q, [runnerId])
+        .then(res => {reply.send(res.rows)})
+        .catch(e => {
+            console.error(e.stack);
+            reply.send({status:'error'}) ;
+        })
+}) ;
+
+
+
 // Return last update timestamp
 fastify.get('/last_update_timestamp', async (request, reply) => {
     var q = 'SELECT max(last_vote) from elo.elo_batch ;' ;

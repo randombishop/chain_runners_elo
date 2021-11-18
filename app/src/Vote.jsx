@@ -8,78 +8,31 @@ import Runner from './Runner' ;
 
 class Vote extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            runner1: null,
-            runner2: null
-        }
-    }
-
-    componentDidMount = () => {
-        this.loadRunners() ;
-    }
-
-    componentDidUpdate(prevProps) {
-        if ((prevProps.runner1 !== this.props.runner1) || (prevProps.runner2 !== this.props.runner2)) {
-            this.loadRunners() ;
-        }
-    }
-
-    loadRunners = () => {
-        if (this.props.runner1!=null && this.props.runner2!=null) {
-            let id1 = this.props.runner1.id ;
-            let id2 = this.props.runner2.id ;
-            console.log('id1', id1) ;
-            console.log('id2', id2) ;
-            this.loadRunner(id1,'runner1') ;
-            this.loadRunner(id2,'runner2') ;
-        }
-    }
-
-    loadRunner = (id, slot) => {
-       let self = this ;
-       fetch('lore/'+id+'.json', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-       }).then(response => response.json())
-          .then(result => {self.loadRunner2(result, slot);})
-          .catch((error) => {alert('Error:', error);});
-    }
-
-    loadRunner2 = (data, slot) => {
-        let state = {} ;
-        state[slot] = data ;
-        this.setState(state) ;
-    }
-
     renderVersus() {
         if (this.props.voted)  {
             switch (this.props.winner) {
-                case 0: return (<div>
+                case 0: return (<React.Fragment>
                                     <img src="draw.png" alt="draw" className="vote-img-result"/>
                                     <br/>
                                     <div className="vote-txt-result">0 - 0</div>
-                                </div>
+                                </React.Fragment>
                                ) ;
-                case 1: return (<div>
+                case 1: return (<React.Fragment>
                                     <img src="winner_left.png" alt="win" className="vote-img-result"/>
                                     <br/>
                                     <div className="vote-txt-result">1 - 0</div>
-                                </div>
+                                </React.Fragment>
                                ) ;
-                case 2: return (<div>
+                case 2: return (<React.Fragment>
                                     <img src="winner_right.png" alt="win" className="vote-img-result"/>
                                     <br/>
                                     <div className="vote-txt-result">0 - 1</div>
-                                </div>
+                                </React.Fragment>
                                ) ;
                 default: return "" ;
             } ;
         } else {
-            return (<div>
+            return (<React.Fragment>
                         <img src="versus.png"  alt="versus" width="200px" height="200px"/>
                         <br/>
                         <Button size="large" variant="contained"
@@ -87,7 +40,7 @@ class Vote extends Component {
                             onClick={this.props.vote(0)}
                             >
                         DRAW!</Button>
-                    </div>) ;
+                    </React.Fragment>) ;
         }
     }
 
@@ -108,7 +61,8 @@ class Vote extends Component {
         return (
             <Grid container spacing={1}>
                 <Grid item lg={5} sm={12}>
-                    <Runner data={this.state.runner1}
+                    <Runner runner={this.props.runner1}
+                            mode="vote"
                             vote={this.props.vote(1)}
                             voted={this.props.voted}
                             isWinner={this.props.winner===1}
@@ -121,7 +75,8 @@ class Vote extends Component {
                     {this.renderNext()}
                 </Grid>
                 <Grid item lg={5} sm={12}>
-                    <Runner data={this.state.runner2}
+                    <Runner runner={this.props.runner2}
+                            mode="vote"
                             vote={this.props.vote(2)}
                             voted={this.props.voted}
                             isWinner={this.props.winner===2}

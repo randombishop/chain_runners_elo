@@ -11,9 +11,13 @@
     color: #00ff54;
 }
 
+.navbar-grid {
+    padding:10px;
+    background-color:rgba(32, 64, 32, 0.75)
+}
+
 .navbar-box {
     text-align:center;
-    line-height:80px
 }
 
 .navbar-title {
@@ -41,28 +45,28 @@
     font-weight: bold;
 }
 
-.vote-panel {
+.runner-panel {
   position: relative;
   background-image: url("panel2.png");
-  background-size: 450px 700px;
-  width: 450px;
+  background-size: 400px 700px;
+  width: 400px;
   height: 700px;
   margin-inline:auto;
 }
 
-.vote-panel-draw {
+.runner-panel-draw {
   margin-top: 60px;
 }
 
-.vote-panel-winner {
+.runner-panel-winner {
   margin-top: 30px;
 }
 
-.vote-panel-looser {
+.runner-panel-looser {
   margin-top: 90px;
 }
 
-.vote-panel-title {
+.runner-panel-title {
     position: absolute;
     left: 20px;
     top: 20px;
@@ -71,7 +75,7 @@
     font-weight: bold;
 }
 
-.vote-panel-name {
+.runner-panel-name {
     position: absolute;
     left: 20px;
     top: 70px;
@@ -84,7 +88,7 @@
     font-weight: bold;
 }
 
-.vote-panel-avatar {
+.runner-panel-avatar {
     position: absolute;
     right: 20px;
     top: 70px;
@@ -92,18 +96,18 @@
     height: 100px;
 }
 
-.vote-panel-text {
+.runner-panel-text {
     position: absolute;
     left: 20px;
     top: 200px;
-    width: 400px;
+    width: 350px;
     height: 375px;
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 10px;
 }
 
-.vote-panel-action {
+.runner-panel-action {
     position: absolute;
     left: 20px;
     right: 20px;
@@ -125,8 +129,8 @@
 .ranking-panel {
   position: relative;
   background-image: url("panel3.png");
-  background-size: 750px 700px;
-  width: 750px;
+  background-size: 600px 700px;
+  width: 600px;
   height: 700px;
   margin-top: 50px;
   margin-inline:auto;
@@ -145,7 +149,7 @@
     position: absolute;
     left: 20px;
     top: 70px;
-    width: 700px;
+    width: 560px;
     height: 500px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -173,6 +177,12 @@
 .ranking-table-row {
     line-height: 40px;
     font-size: 18px;
+}
+
+.ranking-table-row:hover {
+   cursor:pointer;
+   background-color: #1a4e71;
+   box-shadow: 1px 1px #1a4e71;
 }
 
 .ranking-panel-table th {

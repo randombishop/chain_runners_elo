@@ -51,7 +51,10 @@ class RollingImage extends Component {
     }
 
     render() {
-        return (<img src={this.state.current} width={this.props.size} height={this.props.size}  alt="avatar"/>) ;
+        return (<img src={this.state.current} width={this.props.size} height={this.props.size}
+                     alt="avatar"
+                     style={{verticalAlign:'bottom'}}
+                />) ;
     }
 
 }
