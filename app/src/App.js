@@ -184,7 +184,7 @@ class App extends Component {
     let nonce=this.state.nonce ;
     let signature=this.state.signature ;
     let numOwnedRunners=this.state.numOwnedRunners ;
-    if (address==null || signature==null || nonce==null || numOwnedRunners==0) {
+    if (address==null || signature==null || nonce==null || numOwnedRunners===0) {
         alert('Sorry, you can only vote after connecting your wallet, and you need to own at least one chain runner.') ;
         return ;
     }

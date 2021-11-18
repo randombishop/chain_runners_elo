@@ -6,7 +6,7 @@ import RollingImage from './RollingImage' ;
 import {getBackend} from './utils' ;
 
 
-const DASH_LINE = '---------------------------------------' ;
+const DASH_LINE = '------------------------------------------' ;
 
 
 class Runner extends Component {

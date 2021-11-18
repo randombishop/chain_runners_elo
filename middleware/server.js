@@ -1,6 +1,6 @@
 const fastify = require('fastify')({ logger: true })
 const path = require('path');
-
+const ethUtil = require('ethereumjs-util') ;
 
 // Add cors allow
 fastify.register(require('fastify-cors'), {}) ;
@@ -9,6 +9,32 @@ fastify.register(require('fastify-cors'), {}) ;
 const { Client } = require('pg')
 const client = new Client()
 client.connect()
+
+
+// Signature verification
+function verifySignature(address, nonce, signature) {
+    console.log('verifySignature') ;
+    var msg = "Hi, I'd like to login into datascience.art\nTimestamp: "+nonce ;
+    console.log('msg', msg) ;
+    var msgBufferHex = ethUtil.bufferToHex(Buffer.from(msg, 'utf8'));
+    var msgBuffer = ethUtil.toBuffer(msgBufferHex);
+    var msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+    var signatureBuffer = ethUtil.toBuffer(signature);
+    var signatureParams = ethUtil.fromRpcSig(signatureBuffer);
+    var publicKey = ethUtil.ecrecover(
+      msgHash,
+      signatureParams.v,
+      signatureParams.r,
+      signatureParams.s
+    );
+    var addressBuffer = ethUtil.publicToAddress(publicKey);
+    var signerAddress = ethUtil.bufferToHex(addressBuffer);
+
+    console.log('signerAddress', signerAddress) ;
+    console.log('address', address) ;
+    // The signature verification is successful if the address provided matches the ecrecover public address
+    return (address.toLowerCase() === signerAddress.toLowerCase()) ;
+}
 
 
 // Declare the main public route
@@ -36,7 +62,8 @@ fastify.get('/runner_history/:runnerId', async (request, reply) => {
         q+= 'from elo.vote as v ' ;
         q+= 'inner join elo.runner as r1 on r1.id=v.runner1  ' ;
         q+= 'inner join elo.runner as r2 on r2.id=v.runner2 ' ;
-        q+= 'where v.runner1=$1 or v.runner2=$1 ;' ;
+        q+= 'where v.runner1=$1 or v.runner2=$1 ' ;
+        q+= 'order by time ' ;
     var runnerId = request.params.runnerId ;
     client
         .query(q, [runnerId])
@@ -63,12 +90,16 @@ fastify.get('/last_update_timestamp', async (request, reply) => {
 
 // Declare our json handling route
 fastify.post('/submit_vote', async (request, reply) => {
-    var q = 'INSERT INTO elo.vote(address, runner1, runner2, result) VALUES($1, $2, $3, $4) ;' ;
     var data = request.body ;
     var address = data.address ;
-    if (address==null) {
-        address="anon" ;
+    var nonce = data.nonce ;
+    var signature = data.signature ;
+    var verified = verifySignature(address, nonce, signature) ;
+    if (!verified) {
+        reply.send({status:'authentication error'}) ;
     }
+
+    var q = 'INSERT INTO elo.vote(address, runner1, runner2, result) VALUES($1, $2, $3, $4) ;' ;
     var runner1 = data.runner1 ;
     var runner2 = data.runner2 ;
     var result = data.result ;
