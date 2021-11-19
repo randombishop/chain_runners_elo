@@ -1,8 +1,9 @@
 import React, { Component } from 'react' ;
 
 
-const BASE_URL = "https://chain-runners-api.vercel.app/api/v1/img/" ;
-const LOADING_URL = "empty.png" ;
+import {BASE_RUNNER_IMG_URL, EMPTY_IMG_URL} from './utils' ;
+
+
 const TIME_TO_ROLL = 1000 ;
 
 
@@ -12,7 +13,7 @@ class RollingImage extends Component {
         super(props);
         this.state = {
             counter: 0,
-            current: LOADING_URL
+            current: EMPTY_IMG_URL
         }
     }
 
@@ -39,13 +40,13 @@ class RollingImage extends Component {
             let counter = (this.state.counter+1)%n ;
             let state = {
                 counter: counter,
-                current: BASE_URL+this.props.data[counter]
+                current: BASE_RUNNER_IMG_URL+this.props.data[counter]
             }
             this.setState(state) ;
         } else {
             this.setState({
                 counter: 0,
-                current: LOADING_URL
+                current: EMPTY_IMG_URL
             }) ;
         }
     }

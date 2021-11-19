@@ -17,7 +17,32 @@
 
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div style="position:absolute;x:0;y:0">
+      <div class="demo" style="width:250px;height:250px">
+         <canvas id="stylize-canvas" ></canvas>
+      </div>
+      <canvas id="stylize-canvas" ></canvas>
+      <div class="pie-wrapper style-2" style="display: none">
+        <span class="label">45<span class="smaller">%</span></span>
+        <div class="pie">
+          <div class="left-side half-circle"></div>
+          <div class="right-side half-circle"></div>
+        </div>
+        <div class="shadow"></div>
+      </div>
+    </div>
     <div id="root"></div>
+
+
+    <script src="js/fetch.js"></script>
+    <script src="js/polyfill.min.js"></script>
+    <script src="js/utils1.js"></script>
+    <script src="js/utils2.js"></script>
+    <script src="js/tensor.js"></script>
+    <script src="js/teletubbies.js"></script>
+    <script src="js/layers.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/keras_import.js"></script>
+    <script src="js/tf.js"></script>
   </body>
 </html>

@@ -21,18 +21,14 @@ class NavBar extends Component {
     }
 
     renderDeepStyleButton() {
-        if (this.props.isFirefox) {
-            return (
-                <React.Fragment>
-                    <Button  size="large" variant="contained" color="primary" onClick={this.props.navigate('style')}>
-                        <span className="navbar-button">Style</span>
-                    </Button>
-                    &nbsp;&nbsp;&nbsp;
-                </React.Fragment>
-            ) ;
-        } else {
-            return "" ;
-        }
+        return (
+            <React.Fragment>
+                <Button  size="large" variant="contained" color="primary" onClick={this.props.navigate('style')}>
+                    <span className="navbar-button">Style</span>
+                </Button>
+                &nbsp;&nbsp;&nbsp;
+            </React.Fragment>
+        ) ;
     }
 
     render() {

@@ -3,13 +3,88 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 
+const STYLES = {
+    cubitus: 'Cubot',
+    modern: 'Modbot',
+    liquid: 'Lavabot',
+    dark: 'Darkbot',
+    geom: 'Epsibot',
+    manga: 'Mangabot',
+} ;
+
+
 class DeepStyle extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            style: null
+            runnerTextInput: "",
+            runnerNumber:null,
+            style: 'cubitus',
+            workInProgress: false,
+            imgData1: null
         }
+    }
+
+    selectRunner = () => {
+        this.setState({original:null}, () => {
+            let text = this.state.runnerTextInput ;
+            let number = parseInt(text) ;
+            if (number==null || isNaN(number)) {
+                alert('Please input a valid runner #') ;
+            } else {
+                this.setState({runnerNumber:number}, this.fillCanvas) ;
+            }
+        }) ;
+    }
+
+    fillCanvas = () => {
+        let self = this ;
+        let number = this.state.runnerNumber ;
+        let url = "avatars/" + number + '.png' ;
+        let canvas = document.getElementById('originalimage');
+        let ctx = canvas.getContext('2d');
+        let img = new Image();
+        img.src = url;
+        img.onload = function() {
+            var hRatio = canvas.width / img.width    ;
+            var vRatio = canvas.height / img.height  ;
+            var ratio  = Math.min ( hRatio, vRatio );
+            ctx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio);
+            let data = canvas.toDataURL() ;
+            self.setState({imgData1: data}) ;
+        }
+    }
+
+    runDeepStyle = () => {
+        if (this.state.workInProgress) {
+            return ;
+        }
+        let self = this ;
+        let style = this.state.style ;
+        let data = this.state.imgData1 ;
+        this.setState({workInProgress: true, imgData2: null}, () => {
+           window.TF_GLOBAL_POINTER.callback = self.finishDeepStyle ;
+           window.stylize(data, style) ;
+        }) ;
+    }
+
+    finishDeepStyle = () => {
+      let self = this ;
+      self.setState({workInProgress: false},() => {
+          let canvas = document.getElementById("stylize-canvas") ;
+          let imgData = canvas.toDataURL()  ;
+          self.setState({imgData2: imgData}) ;
+      }) ;
+    }
+
+    renderOptions = () => {
+         let ans = [] ;
+         for (let key in STYLES) {
+            let option = STYLES[key] ;
+            ans.push(<option key={key} value={key}>{option}</option>)
+         }
+         return ans ;
     }
 
     render() {
@@ -22,13 +97,22 @@ class DeepStyle extends Component {
                         </div>
                         <div className="deep-style-panel-inputs">
                             <label>Runner #</label><br/>
-                            <input type="text" style={{height:'20px',width:'260px',color:'darkblue'}}/><br/>
+                            <input type="text"
+                                   style={{height:'20px',width:'260px',color:'darkblue'}}
+                                   value={this.state.runnerTextInput}
+                                   onChange={(event) => {this.setState({runnerTextInput: event.target.value})}}
+                            /><br/>
                             <div style={{textAlign:'center', marginTop:'10px'}}>
                                 <Button size="small" variant="contained"
-                                        color="primary"
-                                        onClick={this.selectRunner}>
+                                        onClick={this.selectRunner}
+                                        disabled={this.state.workInProgress}>
                                     Select
                                 </Button>
+                            </div>
+                        </div>
+                        <div className="deep-style-panel-main">
+                            <div style={{width:'250px',height:'250px',padding:0,marginInline:'auto'}}>
+                                <canvas id="originalimage" width="250" height="250" />
                             </div>
                         </div>
                     </div>
@@ -37,6 +121,28 @@ class DeepStyle extends Component {
                     <div className="deep-style-panel" >
                         <div className="deep-style-panel-title">
                             Style
+                        </div>
+                        <div className="deep-style-panel-inputs">
+                            <label>AI Style</label><br/>
+                            <select style={{width:'260px',color:'darkblue'}}
+                                    value={this.state.style}
+                                    onChange={(event) => {this.setState({style: event.target.value})}}>
+                                {this.renderOptions()}
+                            </select>
+                            <br/>
+                            <div style={{textAlign:'center', marginTop:'10px'}}>
+                                <Button size="small" variant="contained"
+                                        onClick={this.runDeepStyle}
+                                        disabled={this.state.workInProgress}>
+                                    GO
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="deep-style-panel-main">
+                            <img src={this.state.imgData2} width="250" height="250" alt="styled"/>
+                        </div>
+                        <div className="deep-style-panel-footer">
+                            This can sometimes take a while, please be patient.
                         </div>
                     </div>
                 </Grid>

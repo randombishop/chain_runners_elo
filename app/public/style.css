@@ -1,4 +1,8 @@
 #root {
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
   color: white;
   font-family: monospace;
   background-image: url("background.jpeg");
@@ -226,6 +230,20 @@
     padding: 15px;
 }
 
-input {
-    color: white;
+.deep-style-panel-main {
+    position: absolute;
+    left: 20px;
+    top: 200px;
+    right: 20px;
+    height: 280px;
+    text-align:center;
+}
+
+.deep-style-panel-footer {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    height: 50px;
+    text-align: center
 }
