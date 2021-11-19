@@ -3,6 +3,9 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 
+import {BASE_RUNNER_IMG_URL} from './utils' ;
+
+
 const STYLES = {
     cubitus: 'Cubot',
     modern: 'Modbot',
@@ -39,9 +42,12 @@ class DeepStyle extends Component {
     }
 
     fillCanvas = () => {
+        if (this.state.workInProgress) {
+            return ;
+        }
         let self = this ;
         let number = this.state.runnerNumber ;
-        let url = "avatars/" + number + '.png' ;
+        let url = BASE_RUNNER_IMG_URL + number + '.png' ;
         let canvas = document.getElementById('originalimage');
         let ctx = canvas.getContext('2d');
         let img = new Image();
@@ -63,6 +69,10 @@ class DeepStyle extends Component {
         let self = this ;
         let style = this.state.style ;
         let data = this.state.imgData1 ;
+        if (data==null) {
+            alert('Please load your runner image first.') ;
+            return ;
+        }
         this.setState({workInProgress: true, imgData2: null}, () => {
            window.TF_GLOBAL_POINTER.callback = self.finishDeepStyle ;
            window.stylize(data, style) ;
@@ -70,12 +80,9 @@ class DeepStyle extends Component {
     }
 
     finishDeepStyle = () => {
-      let self = this ;
-      self.setState({workInProgress: false},() => {
-          let canvas = document.getElementById("stylize-canvas") ;
-          let imgData = canvas.toDataURL()  ;
-          self.setState({imgData2: imgData}) ;
-      }) ;
+      let canvas = document.getElementById("stylize-canvas") ;
+      let imgData = canvas.toDataURL()  ;
+      this.setState({workInProgress: false,imgData2: imgData}) ;
     }
 
     renderOptions = () => {
@@ -139,17 +146,33 @@ class DeepStyle extends Component {
                             </div>
                         </div>
                         <div className="deep-style-panel-main">
-                            <img src={this.state.imgData2} width="250" height="250" alt="styled"/>
+                            {this.state.imgData2?
+                            <img src={this.state.imgData2} width="250" height="250" alt="styled"/>:
+                            ""}
                         </div>
                         <div className="deep-style-panel-footer">
-                            This can sometimes take a while, please be patient.
+                            {this.state.workInProgress?
+                            "This can sometimes take a while, please be patient.":
+                            ""}
                         </div>
                     </div>
                 </Grid>
                 <Grid item lg={4} sm={12}>
-                    <div className="deep-style-panel" >
-                        <div className="deep-style-panel-title">
+                    <div className="about-panel" >
+                        <div className="about-panel-title">
                             About
+                        </div>
+                        <div className="about-panel-text">
+                            If you'd like to support our work, please mint a piece of our collection
+                            at <a target="blank" href="https://www.the23.wtf" className="my-green">the23.wtf</a>
+                            <br/><br/>
+                            It's a limited collection of 100 pieces of shit to record rug pulls, scams, and all kind of crazy shit happening in Ethereum blockchain.
+                            <br/><br/>
+                            We're also working on a Pacman like network game where chain runners will run from Somnus and have fun;
+                            and of course, holding pieces of shit will give the runners super poop powers.
+                            <br/><br/>
+                            Also, all runners are welcome
+                            to our <a target="blank" href="https://discord.com/invite/CmVmWV8K7h" className="my-green">discord server</a>
                         </div>
                     </div>
                 </Grid>

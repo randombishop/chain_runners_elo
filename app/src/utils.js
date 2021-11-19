@@ -1,10 +1,10 @@
 
 function getBackend() {
-    return "http://localhost:3001" ;
-    //return "" ;
+    //return "http://localhost:3001" ;
+    return "" ;
 }
 
-const BASE_RUNNER_IMG_URL = "https://chain-runners-api.vercel.app/api/v1/img/" ;
+const BASE_RUNNER_IMG_URL = "runners/" ;
 
 const EMPTY_IMG_URL = "empty.png" ;
 

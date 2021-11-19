@@ -186,6 +186,10 @@ class App extends Component {
   }
 
   navigate = (page) => () => {
+    if (page==='style' && !this.state.isFirefox) {
+        alert("Sorry, this feature only works on Firefox.")
+        return ;
+    }
     this.setState({page:page}) ;
   }
 
@@ -252,7 +256,6 @@ class App extends Component {
                     address={this.state.address}
                     connect={this.connect}
                     ownedRunners={this.state.ownedRunners}
-                    isFirefox={this.state.isFirefox}
             />
             <Container style={{marginTop:'25px'}}>
                 {this.renderPage()}

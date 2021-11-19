@@ -11,6 +11,9 @@
 node_modules
 package-lock.json
 
+# Runner images
+app/public/runners/*.png
+
 
 
 

@@ -40,7 +40,7 @@ class RollingImage extends Component {
             let counter = (this.state.counter+1)%n ;
             let state = {
                 counter: counter,
-                current: BASE_RUNNER_IMG_URL+this.props.data[counter]
+                current: BASE_RUNNER_IMG_URL+this.props.data[counter]+".png"
             }
             this.setState(state) ;
         } else {
@@ -53,7 +53,7 @@ class RollingImage extends Component {
 
     render() {
         return (<img src={this.state.current} width={this.props.size} height={this.props.size}
-                     alt="avatar"
+                     alt="-"
                      style={{verticalAlign:'bottom'}}
                 />) ;
     }
