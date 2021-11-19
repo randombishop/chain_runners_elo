@@ -20,6 +20,21 @@ class NavBar extends Component {
         }
     }
 
+    renderDeepStyleButton() {
+        if (this.props.isFirefox) {
+            return (
+                <React.Fragment>
+                    <Button  size="large" variant="contained" color="primary" onClick={this.props.navigate('style')}>
+                        <span className="navbar-button">Style</span>
+                    </Button>
+                    &nbsp;&nbsp;&nbsp;
+                </React.Fragment>
+            ) ;
+        } else {
+            return "" ;
+        }
+    }
+
     render() {
         return (
             <Grid container spacing={3} className="navbar-grid">
@@ -40,6 +55,7 @@ class NavBar extends Component {
                         <span className="navbar-button">Ranking</span>
                     </Button>
                     &nbsp;&nbsp;&nbsp;
+                    {this.renderDeepStyleButton()}
                     <Button size="large"
                             variant="contained"
                             color="secondary"

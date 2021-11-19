@@ -138,7 +138,7 @@ class RankingTable extends Component {
     render() {
         return (
             <div className="ranking-panel">
-                <div className="ranking-panel-title">
+                <div className="panel-title">
                     Ranking
                 </div>
                 <div className="ranking-panel-table">

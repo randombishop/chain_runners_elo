@@ -203,7 +203,7 @@ class Runner extends Component {
     render() {
         return (
             <div className={"runner-panel "+this.additionalClass()} >
-                <div className="runner-panel-title">
+                <div className="panel-title">
                     {this.getTitle()}
                 </div>
                 <div className="runner-panel-name">

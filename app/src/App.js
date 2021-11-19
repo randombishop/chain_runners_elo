@@ -9,6 +9,7 @@ import { ethers } from "ethers";
 import NavBar from './NavBar' ;
 import Vote from './Vote' ;
 import Ranking from './Ranking' ;
+import DeepStyle from './DeepStyle' ;
 import {getBackend, CHAIN_RUNNERS_CONTRACT, CHAIN_RUNNERS_ABI, THE23_CONTRACT, THE23_ABI} from './utils' ;
 
 
@@ -43,13 +44,24 @@ class App extends Component {
         signature: null,
         numOwnedRunners: 0,
         ownedRunners: [],
-        lookupOwners: true
+        lookupOwners: true,
+
+        isFirefox: false
     }
   }
 
   componentDidMount = () => {
+    this.checkFirefox() ;
     this.loadRanking() ;
     this.loadLastUpdateTimestamp() ;
+  }
+
+  checkFirefox = () => {
+    let f = navigator.userAgent.search("Firefox");
+    let state = {
+        isFirefox:  (f > -1)
+    } ;
+    this.setState(state) ;
   }
 
   connect = () => {
@@ -156,7 +168,6 @@ class App extends Component {
         return ;
     }
     let n = this.state.ranking.length ;
-    console.log('n', n) ;
     let random1 = Math.floor(Math.random() * n);
     let direction =  (Math.random()>0.5)?1:(-1) ;
     let offset = Math.floor(Math.random() * MAX_OFFSET);
@@ -228,6 +239,7 @@ class App extends Component {
         case 'ranking': return <Ranking data={this.state.ranking}
                                         lastUpdateTimestamp={this.state.lastUpdateTimestamp}
                                 /> ;
+        case 'style': return <DeepStyle /> ;
         default: return "" ;
     }
   }
@@ -239,7 +251,9 @@ class App extends Component {
             <NavBar navigate={this.navigate}
                     address={this.state.address}
                     connect={this.connect}
-                    ownedRunners={this.state.ownedRunners}/>
+                    ownedRunners={this.state.ownedRunners}
+                    isFirefox={this.state.isFirefox}
+            />
             <Container style={{marginTop:'25px'}}>
                 {this.renderPage()}
             </Container>

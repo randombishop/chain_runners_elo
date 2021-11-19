@@ -45,6 +45,16 @@
     font-weight: bold;
 }
 
+.panel-title {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    line-height: 25px;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+
 .runner-panel {
   position: relative;
   background-image: url("panel2.png");
@@ -64,15 +74,6 @@
 
 .runner-panel-looser {
   margin-top: 90px;
-}
-
-.runner-panel-title {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    line-height: 25px;
-    font-size: xx-large;
-    font-weight: bold;
 }
 
 .runner-panel-name {
@@ -136,15 +137,6 @@
   margin-inline:auto;
 }
 
-.ranking-panel-title {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    line-height: 25px;
-    font-size: xx-large;
-    font-weight: bold;
-}
-
 .ranking-panel-table {
     position: absolute;
     left: 20px;
@@ -202,4 +194,38 @@
 .ranking-table-row img {
     display:table-cell;
     vertical-align:middle;
+}
+
+
+.deep-style-panel {
+  position: relative;
+  background-image: url("panel2.png");
+  background-size: 340px 600px;
+  width: 340px;
+  height: 600px;
+  margin-top: 100px;
+  margin-inline:auto;
+}
+
+.deep-style-panel-title {
+    position: absolute;
+    left: 20px;
+    top: 16px;
+    line-height: 25px;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+.deep-style-panel-inputs {
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    right: 20px;
+    height: 100px;
+    overflow: hidden;
+    padding: 15px;
+}
+
+input {
+    color: white;
 }
