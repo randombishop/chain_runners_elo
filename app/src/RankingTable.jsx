@@ -146,7 +146,7 @@ class RankingTable extends Component {
                 </div>
                 <div className="ranking-panel-info">
                     Last updated: <span className="my-green"><strong>{this.props.lastUpdateTimestamp}</strong></span><br/>
-                    (This is still a prototype, final algorithm still being worked on...)
+                    (Rating system uses ELO algorithm with the same parameters as MegaCity's Chess Organization)
                 </div>
                 <div className="ranking-panel-action">
                     {this.renderButtons()}
