@@ -37,7 +37,7 @@ function verifySignature(address, nonce, signature) {
 
 // Declare the main public route
 fastify.register(require("fastify-static"), {
-  root: path.join(__dirname, "../app/build"),
+  root: path.join(__dirname, "..", "app", "build"),
   prefix: "/",
 });
 
