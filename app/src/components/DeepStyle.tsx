@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 
-import { BASE_RUNNER_IMG_URL } from './utils'
+import { BASE_RUNNER_IMG_URL } from '../utils/utils'
 
 const STYLES = {
   cubitus: 'Cubot',
