@@ -8,7 +8,8 @@
   background-image: url("background.jpeg");
   background-repeat: no-repeat;
   background-size: cover;
-  padding-bottom: 125px
+  padding-bottom: 125px;
+  height: 100%;
 }
 
 .my-green {
