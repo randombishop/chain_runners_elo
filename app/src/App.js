@@ -88,7 +88,7 @@ class App extends Component {
           self.setState({ address: address }, self.oneTimeSignature)
         })
         .catch(error => {
-          alert(error)
+          console.error(error)
         })
     })
   }
@@ -104,7 +104,7 @@ class App extends Component {
         self.loadOwnedRunners()
       })
       .catch(error => {
-        alert(error)
+        console.error(error)
       })
   }
 
@@ -145,7 +145,7 @@ class App extends Component {
         self.receiveRanking(result)
       })
       .catch(error => {
-        alert('Error:', error)
+        console.error('Error:', error)
       })
   }
   loadLastUpdateTimestamp = () => {
@@ -161,7 +161,7 @@ class App extends Component {
         self.setState({ lastUpdateTimestamp: result })
       })
       .catch(error => {
-        alert('Error:', error)
+        console.error('Error:', error)
       })
   }
 
@@ -242,7 +242,7 @@ class App extends Component {
         self.voted(winner, result)
       })
       .catch(error => {
-        alert('Error:', error)
+        console.error('Error:', error)
       })
   }
 
@@ -250,7 +250,7 @@ class App extends Component {
     if (result.status === 'ok') {
       this.setState({ voted: true, winner: winner })
     } else {
-      alert(result.status)
+      console.error(result.status)
     }
   }
 
@@ -285,6 +285,7 @@ class App extends Component {
             address={this.state.address}
             connect={this.connect}
             ownedRunners={this.state.ownedRunners}
+            isFirefox={this.state.isFirefox}
           />
           <Container style={{ marginTop: '25px' }}>{this.renderPage()}</Container>
         </div>

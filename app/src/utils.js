@@ -1,6 +1,7 @@
+const isDev = process.env.NODE_ENV === 'development'
+
 function getBackend() {
-  //return "http://localhost:3001" ;
-  return ''
+  return isDev ? 'http://localhost:3001' : ''
 }
 
 const BASE_RUNNER_IMG_URL = 'runners/'
@@ -683,6 +684,7 @@ const THE23_ABI = [
 ]
 
 export {
+  isDev,
   getBackend,
   BASE_RUNNER_IMG_URL,
   EMPTY_IMG_URL,

@@ -16,6 +16,7 @@ class NavBar extends Component {
   }
 
   renderDeepStyleButton() {
+    if (!this.props.isFirefox) return null
     return (
       <React.Fragment>
         <Button size="large" variant="contained" color="primary" onClick={this.props.navigate('style')}>
