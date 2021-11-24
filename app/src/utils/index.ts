@@ -681,7 +681,7 @@ const THE23_ABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-]
+] as const
 
 export {
   isDev,

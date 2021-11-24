@@ -10,7 +10,7 @@ export interface VoteProps {
   runner1: RunnerType
   runner2: RunnerType
   next: () => any
-  vote: (vote: VoteNumber) => void
+  vote: (vote: VoteNumber, result: { status: 'ok' | string }) => void
   voted: boolean
   winner: VoteNumber
 }
@@ -57,7 +57,7 @@ const Vote: React.FC<VoteProps> = props => {
             style={{ fontWeight: 'bold' }}
             onClick={e => {
               e.preventDefault()
-              props.vote(0)
+              props.vote(0, { status: 'ok' })
             }}
           >
             DRAW!
@@ -82,7 +82,7 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner1}
           mode="vote"
-          vote={() => props.vote(1)}
+          vote={() => props.vote(1, { status: 'ok' })}
           voted={props.voted}
           isWinner={props.winner === 1}
           isLooser={props.winner === 2}
@@ -99,7 +99,7 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner2}
           mode="vote"
-          vote={() => props.vote(2)}
+          vote={() => props.vote(2, { status: 'ok' })}
           voted={props.voted}
           isWinner={props.winner === 2}
           isLooser={props.winner === 1}
