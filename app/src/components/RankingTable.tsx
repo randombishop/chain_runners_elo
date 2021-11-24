@@ -100,8 +100,8 @@ const ItemList: React.FC<ItemListProps> = props => {
         </tr>
       </thead>
       <tbody>
-        {list.map(x => (
-          <Item item={x} runnerClicked={runnerClicked} />
+        {list.map((x, i) => (
+          <Item item={x} runnerClicked={runnerClicked} key={i} />
         ))}
       </tbody>
     </table>
@@ -161,4 +161,5 @@ const RankingTable: React.FC<RankingTableProps> = props => {
     </div>
   )
 }
+
 export default RankingTable

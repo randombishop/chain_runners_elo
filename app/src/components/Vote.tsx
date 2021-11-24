@@ -15,7 +15,7 @@ export interface VoteProps {
   runner1: RunnerType
   runner2: RunnerType
   next: () => any
-  vote: (vote: VoteNumber, result: { status: 'ok' | string }) => void
+  vote: (vote: VoteNumber, result: { status: 'ok' | string }) => () => void
   voted: boolean
   winner: VoteNumber
 }
@@ -62,7 +62,7 @@ const Vote: React.FC<VoteProps> = props => {
             style={{ fontWeight: 'bold' }}
             onClick={e => {
               e.preventDefault()
-              props.vote(0, { status: 'ok' })
+              props.vote(VoteNumber.ZERO, { status: 'ok' })
             }}
           >
             DRAW!
@@ -87,11 +87,10 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner1}
           mode="vote"
-          // @ts-expect-error
-          vote={props.vote(1, { status: 'ok' })}
+          vote={props.vote(VoteNumber.ONE, { status: 'ok' })}
           voted={props.voted}
           isWinner={props.winner === 1}
-          isLooser={props.winner === 2}
+          isLoser={props.winner === 2}
         />
       </Grid>
       <Grid item lg={2} sm={12} style={{ textAlign: 'center', paddingTop: '150px' }}>
@@ -105,10 +104,10 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner2}
           mode="vote"
-          vote={() => props.vote(2, { status: 'ok' })}
+          vote={props.vote(VoteNumber.TWO, { status: 'ok' })}
           voted={props.voted}
           isWinner={props.winner === 2}
-          isLooser={props.winner === 1}
+          isLoser={props.winner === 1}
         />
       </Grid>
     </Grid>

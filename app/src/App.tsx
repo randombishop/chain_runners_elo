@@ -43,7 +43,7 @@ interface AppState {
   nonce: number
   signature?: string
   numOwnedRunners: number
-  ownedRunners: any[]
+  ownedRunners: number[]
   lookupOwners: boolean
 
   isFirefox: boolean
@@ -318,6 +318,7 @@ class App extends Component<{}, AppState> {
   }
 
   render() {
+    console.log({ owned: this.state.ownedRunners })
     return (
       <ThemeProvider theme={theme}>
         <div>

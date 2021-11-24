@@ -68,6 +68,7 @@ const DeepStyle: React.FC = () => {
 
     // @ts-expect-error TODO What's this?
     window.TF_GLOBAL_POINTER.callback = finishDeepStyle
+
     // @ts-expect-error TODO What's this?
     window.stylize(imgData1, style)
   }

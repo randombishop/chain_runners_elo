@@ -11,10 +11,10 @@ const DASH_LINE = '------------------------------------------'
 export type Tab = 'lore' | 'results'
 
 export type Result = {
-  runner1: any
-  runner2: any
-  address: any
-  time: any
+  runner1: number
+  runner2: number
+  address: string
+  time: string
   result: VoteNumber
 }
 
@@ -24,13 +24,54 @@ export interface RunnerProps {
   vote?: () => any
   voted?: boolean
   isWinner?: boolean
-  isLooser?: boolean
+  isLoser?: boolean
+}
+
+const getScore = (result: VoteNumber) => {
+  if (result === 0) return '0 - 0'
+  if (result === 1) return '1 - 0'
+  if (result === 2) return '0 - 1'
+}
+
+const VoteItem: React.FC<{ result: Result }> = props => {
+  return (
+    <div className="runner-panel-result">
+      {props.result.address} <br />
+      {props.result.time} <br />
+      {props.result.runner1} - {props.result.runner2}
+      <br />
+      {getScore(props.result.result)} <br />
+      {DASH_LINE}
+    </div>
+  )
+}
+
+const Results: React.FC<{ history: Result[] }> = props => {
+  if (!props.history.length) return null
+
+  return (
+    <React.Fragment>
+      <span className="my-green">
+        <b>Votes: {props.history.length}</b>
+      </span>
+      <br />
+      {DASH_LINE}
+      <br />
+      {props.history.map((result, i) => (
+        <VoteItem result={result} key={i} />
+      ))}
+    </React.Fragment>
+  )
+}
+
+const Lore: React.FC<{ runner?: RunnerType }> = props => {
+  return <span style={{ whiteSpace: 'pre-wrap' }}>{props.runner ? props.runner.text : ''}</span>
 }
 
 const Runner: React.FC<RunnerProps> = props => {
   const [tab, setTab] = useState<Tab>('lore')
-  const [runner, setRunner] = useState<RunnerType | null>(null)
-  const [history, setHistory] = useState<Result[]>([]) // TODO: Type this
+  const [runner, setRunner] = useState<RunnerType | undefined>(undefined)
+  const [history, setHistory] = useState<Result[]>([])
 
   // Equivalent of componentDidMount and componentDidUpdate
   useEffect(() => {
@@ -53,81 +94,28 @@ const Runner: React.FC<RunnerProps> = props => {
     }
 
     const loadHistory = () => {
-      if (props.mode === 'view') {
-        fetch(`${backendPrefix}/runner_history/${props.runner.id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      if (props.mode !== 'view') return
+
+      fetch(`${backendPrefix}/runner_history/${props.runner.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(result => {
+          setHistory(result)
         })
-          .then(response => response.json())
-          .then(result => {
-            setHistory(result)
-          })
-          .catch(error => {
-            console.error('Error:', error)
-          })
-      }
+        .catch(error => {
+          console.error('Error:', error)
+        })
     }
+
     loadRunner()
     loadHistory()
   }, [props.mode, props.runner])
 
-  const getTitle = () => {
-    if (runner) return `#${runner.ids.join('+')}`
-    return 'Loading...'
-  }
-
-  const renderLore = () => {
-    return <span style={{ whiteSpace: 'pre-wrap' }}>{runner ? runner.text : ''}</span>
-  }
-
-  const renderScore = (result: VoteNumber) => {
-    if (result === 0) return '0 - 0'
-    if (result === 1) return '1 - 0'
-    if (result === 2) return '0 - 1'
-    return ''
-  }
-
-  const renderVoteItem = (i, result: Result) => {
-    return (
-      <div className="runner-panel-result" key={i}>
-        {result.address} <br />
-        {result.time} <br />
-        {result.runner1} - {result.runner2}
-        <br />
-        {renderScore(result.result)} <br />
-        {DASH_LINE}
-      </div>
-    )
-  }
-
-  const renderResults = () => {
-    if (!history.length) return null
-
-    return (
-      <React.Fragment>
-        <span className="my-green">
-          <b>Votes: {history.length}</b>
-        </span>
-        <br />
-        {DASH_LINE}
-        <br />
-        {history.map((value, i) => renderVoteItem(i, value))}
-      </React.Fragment>
-    )
-  }
-
-  const renderBody = () => {
-    switch (tab) {
-      case 'lore':
-        return renderLore()
-      case 'results':
-        return renderResults()
-      default:
-        return ''
-    }
-  }
+  const getTitle = () => (runner ? `#${runner.ids.join('+')}` : 'Loading...')
 
   const renderVotingButton = () => {
     if (!runner) return null
@@ -173,25 +161,14 @@ const Runner: React.FC<RunnerProps> = props => {
 
   const renderButtons = () => {
     if (!runner) return null
-
-    switch (props.mode) {
-      case 'vote':
-        return renderVotingButton()
-      case 'view':
-        return renderViewButtons()
-      default:
-        return ''
-    }
+    if (props.mode === 'vote') return renderVotingButton()
+    if (props.mode === 'view') return renderViewButtons()
   }
 
   const additionalClass = () => {
-    if (props.isWinner) {
-      return 'runner-panel-winner'
-    } else if (props.isLooser) {
-      return 'runner-panel-looser'
-    } else {
-      return 'runner-panel-draw'
-    }
+    if (props.isWinner) return 'runner-panel-winner'
+    if (props.isLoser) return 'runner-panel-loser'
+    return 'runner-panel-draw'
   }
 
   return (
@@ -201,7 +178,9 @@ const Runner: React.FC<RunnerProps> = props => {
       <div className="runner-panel-avatar">
         <RollingImage data={runner ? runner.ids : []} size={100} />
       </div>
-      <div className="runner-panel-text">{renderBody()}</div>
+      <div className="runner-panel-text">
+        {tab === 'lore' ? <Lore runner={runner} /> : <Results history={history} />}
+      </div>
       <div className="runner-panel-action">{renderButtons()}</div>
     </div>
   )

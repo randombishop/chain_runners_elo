@@ -14,7 +14,7 @@ interface RollingImageState {
   current: string
 }
 
-// TODO: Convert this
+// TODO: Convert this to hooks/functional component
 class RollingImage extends Component<RollingImageProps, RollingImageState> {
   loop: any // TODO: Type this
 
