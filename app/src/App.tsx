@@ -228,48 +228,45 @@ const App = () => {
     [isFirefox]
   )
 
-  const sendVote = useCallback(
-    (winner: VoteNumber) => () => {
-      if (address === null || signature === null || nonce === null || numOwnedRunners === 0) {
-        debugger
-        return alert(
-          'Sorry, you can only vote after connecting your wallet, and you need to own at least one chain runner.'
-        )
-      }
-
-      if (!runner1 || !runner2) return console.error('Missing runner1 or runner2 data')
-
-      const data = {
-        runner1: runner1.id,
-        runner2: runner2.id,
-        result: winner,
-        address,
-        nonce,
-        signature,
-      }
-
+  const sendVote = (winner: VoteNumber) => () => {
+    if (address === null || signature === null || nonce === null || numOwnedRunners === 0) {
       debugger
+      return alert(
+        'Sorry, you can only vote after connecting your wallet, and you need to own at least one chain runner.'
+      )
+    }
 
-      fetch(`${backendPrefix}/submit_vote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+    if (!runner1 || !runner2) return console.error('Missing runner1 or runner2 data')
+
+    const data = {
+      runner1: runner1.id,
+      runner2: runner2.id,
+      result: winner,
+      address,
+      nonce,
+      signature,
+    }
+
+    debugger
+
+    fetch(`${backendPrefix}/submit_vote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'ok') {
+          setVoted(true)
+          setWinner(winner)
+        } else {
+          console.error(result.status)
+        }
       })
-        .then(response => response.json())
-        .then(result => {
-          if (result.status === 'ok') {
-            setVoted(true)
-            setWinner(winner)
-          } else {
-            console.error(result.status)
-          }
-        })
-        .catch(error => console.error('Error:', error))
-    },
-    [address, nonce, numOwnedRunners, runner1, runner2, signature]
-  )
+      .catch(error => console.error('Error:', error))
+  }
 
   return (
     <ThemeProvider theme={theme}>
