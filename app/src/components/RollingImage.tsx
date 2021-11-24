@@ -4,8 +4,20 @@ import { BASE_RUNNER_IMG_URL, EMPTY_IMG_URL } from '../utils'
 
 const TIME_TO_ROLL = 1000
 
-class RollingImage extends Component {
-  constructor(props) {
+export interface RollingImageProps {
+  size: number
+  data: string[]
+}
+
+interface RollingImageState {
+  counter: number
+  current: string
+}
+
+class RollingImage extends Component<RollingImageProps, RollingImageState> {
+  loop: any // TODO: Type this
+
+  constructor(props: RollingImageProps) {
     super(props)
     this.state = {
       counter: 0,
@@ -36,7 +48,7 @@ class RollingImage extends Component {
       let counter = (this.state.counter + 1) % n
       let state = {
         counter: counter,
-        current: BASE_RUNNER_IMG_URL + this.props.data[counter] + '.png',
+        current: `${BASE_RUNNER_IMG_URL + this.props.data[counter]}.png`,
       }
       this.setState(state)
     } else {
