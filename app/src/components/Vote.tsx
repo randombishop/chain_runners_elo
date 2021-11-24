@@ -4,10 +4,21 @@ import Button from '@material-ui/core/Button'
 
 import Runner from './Runner'
 
-class Vote extends Component {
-  renderVersus() {
-    if (this.props.voted) {
-      switch (this.props.winner) {
+type VoteNumber = 0 | 1 | 2
+
+export interface VoteProps {
+  runner1: string
+  runner2: string
+  next: () => any
+  vote: (vote: VoteNumber) => void
+  voted: boolean
+  winner: VoteNumber
+}
+
+const Vote: React.FC<VoteProps> = props => {
+  const renderVersus = () => {
+    if (props.voted) {
+      switch (props.winner) {
         case 0:
           return (
             <React.Fragment>
@@ -33,7 +44,7 @@ class Vote extends Component {
             </React.Fragment>
           )
         default:
-          return ''
+          return null
       }
     } else {
       return (
@@ -44,7 +55,10 @@ class Vote extends Component {
             size="large"
             variant="contained"
             style={{ fontWeight: 'bold' }}
-            onClick={this.props.vote(0)}
+            onClick={e => {
+              e.preventDefault()
+              props.vote(0)
+            }}
           >
             DRAW!
           </Button>
@@ -53,50 +67,46 @@ class Vote extends Component {
     }
   }
 
-  renderNext() {
-    if (this.props.voted) {
-      return (
-        <Button size="large" variant="contained" style={{ fontWeight: 'bold' }} onClick={this.props.next}>
-          NEXT MATCH!
-        </Button>
-      )
-    } else {
-      return ''
-    }
-  }
-
-  render() {
+  const renderNext = () => {
+    if (!props.voted) return null
     return (
-      <Grid container spacing={1}>
-        <Grid item lg={5} sm={12}>
-          <Runner
-            runner={this.props.runner1}
-            mode="vote"
-            vote={this.props.vote(1)}
-            voted={this.props.voted}
-            isWinner={this.props.winner === 1}
-            isLooser={this.props.winner === 2}
-          />
-        </Grid>
-        <Grid item lg={2} sm={12} style={{ textAlign: 'center', paddingTop: '150px' }}>
-          {this.renderVersus()}
-          <br />
-          <br />
-          <br />
-          {this.renderNext()}
-        </Grid>
-        <Grid item lg={5} sm={12}>
-          <Runner
-            runner={this.props.runner2}
-            mode="vote"
-            vote={this.props.vote(2)}
-            voted={this.props.voted}
-            isWinner={this.props.winner === 2}
-            isLooser={this.props.winner === 1}
-          />
-        </Grid>
-      </Grid>
+      <Button size="large" variant="contained" style={{ fontWeight: 'bold' }} onClick={props.next}>
+        NEXT MATCH!
+      </Button>
     )
   }
+
+  return (
+    <Grid container spacing={1}>
+      <Grid item lg={5} sm={12}>
+        <Runner
+          runner={props.runner1}
+          mode="vote"
+          vote={props.vote(1)}
+          voted={props.voted}
+          isWinner={props.winner === 1}
+          isLooser={props.winner === 2}
+        />
+      </Grid>
+      <Grid item lg={2} sm={12} style={{ textAlign: 'center', paddingTop: '150px' }}>
+        {renderVersus()}
+        <br />
+        <br />
+        <br />
+        {renderNext()}
+      </Grid>
+      <Grid item lg={5} sm={12}>
+        <Runner
+          runner={props.runner2}
+          mode="vote"
+          vote={props.vote(2)}
+          voted={props.voted}
+          isWinner={props.winner === 2}
+          isLooser={props.winner === 1}
+        />
+      </Grid>
+    </Grid>
+  )
 }
+
 export default Vote
