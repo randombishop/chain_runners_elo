@@ -7,27 +7,31 @@ fastify.register(require("fastify-cors"), {});
 
 // Connect to Postgres
 const { Client } = require("pg");
-const client = new Client();
+const client = new Client({
+  user: "postgres",
+  password: "Number24!",
+  database: "chainrunners",
+});
 client.connect();
 
 // Signature verification
 function verifySignature(address, nonce, signature) {
   console.log("verifySignature");
-  var msg = "Hi, I'd like to login into datascience.art\nTimestamp: " + nonce;
+  const msg = "Hi, I'd like to login into datascience.art\nTimestamp: " + nonce;
   console.log("msg", msg);
-  var msgBufferHex = ethUtil.bufferToHex(Buffer.from(msg, "utf8"));
-  var msgBuffer = ethUtil.toBuffer(msgBufferHex);
-  var msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-  var signatureBuffer = ethUtil.toBuffer(signature);
-  var signatureParams = ethUtil.fromRpcSig(signatureBuffer);
-  var publicKey = ethUtil.ecrecover(
+  const msgBufferHex = ethUtil.bufferToHex(Buffer.from(msg, "utf8"));
+  const msgBuffer = ethUtil.toBuffer(msgBufferHex);
+  const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+  const signatureBuffer = ethUtil.toBuffer(signature);
+  const signatureParams = ethUtil.fromRpcSig(signatureBuffer);
+  const publicKey = ethUtil.ecrecover(
     msgHash,
     signatureParams.v,
     signatureParams.r,
     signatureParams.s
   );
-  var addressBuffer = ethUtil.publicToAddress(publicKey);
-  var signerAddress = ethUtil.bufferToHex(addressBuffer);
+  const addressBuffer = ethUtil.publicToAddress(publicKey);
+  const signerAddress = ethUtil.bufferToHex(addressBuffer);
 
   console.log("signerAddress", signerAddress);
   console.log("address", address);
@@ -43,7 +47,7 @@ fastify.register(require("fastify-static"), {
 
 // Return current ratings
 fastify.get("/ranking", async (request, reply) => {
-  var q =
+  const q =
     "SELECT * from elo.runner left join elo.rating on runner.id=rating.runner_id  order by rating desc;";
   client
     .query(q)
@@ -58,14 +62,14 @@ fastify.get("/ranking", async (request, reply) => {
 
 // Return match history
 fastify.get("/runner_history/:runnerId", async (request, reply) => {
-  var q =
+  const q =
     "select v.address, v.time, r1.name as runner1, r2.name as runner2, v.result ";
   q += "from elo.vote as v ";
   q += "inner join elo.runner as r1 on r1.id=v.runner1  ";
   q += "inner join elo.runner as r2 on r2.id=v.runner2 ";
   q += "where v.runner1=$1 or v.runner2=$1 ";
   q += "order by time ";
-  var runnerId = request.params.runnerId;
+  const runnerId = request.params.runnerId;
   client
     .query(q, [runnerId])
     .then((res) => {
@@ -79,7 +83,7 @@ fastify.get("/runner_history/:runnerId", async (request, reply) => {
 
 // Return last update timestamp
 fastify.get("/last_update_timestamp", async (request, reply) => {
-  var q = "SELECT max(last_vote) from elo.elo_batch ;";
+  const q = "SELECT max(last_vote) from elo.elo_batch ;";
   client
     .query(q)
     .then((res) => {
@@ -93,21 +97,21 @@ fastify.get("/last_update_timestamp", async (request, reply) => {
 
 // Declare our json handling route
 fastify.post("/submit_vote", async (request, reply) => {
-  var data = request.body;
-  var address = data.address;
-  var nonce = data.nonce;
-  var signature = data.signature;
-  var verified = verifySignature(address, nonce, signature);
+  const data = request.body;
+  const address = data.address;
+  const nonce = data.nonce;
+  const signature = data.signature;
+  const verified = verifySignature(address, nonce, signature);
   if (!verified) {
     reply.send({ status: "authentication error" });
   }
 
-  var q =
+  const q =
     "INSERT INTO elo.vote(address, runner1, runner2, result) VALUES($1, $2, $3, $4) ;";
-  var runner1 = data.runner1;
-  var runner2 = data.runner2;
-  var result = data.result;
-  var params = [address, runner1, runner2, result];
+  const runner1 = data.runner1;
+  const runner2 = data.runner2;
+  const result = data.result;
+  const params = [address, runner1, runner2, result];
   client
     .query(q, params)
     .then((res) => {

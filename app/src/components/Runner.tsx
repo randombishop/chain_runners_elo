@@ -1,9 +1,10 @@
-import React, { Component, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@material-ui/core/Button'
 
 import RollingImage from './RollingImage'
-import { getBackend } from '../utils'
+import { backendPrefix } from '../utils'
 import { VoteNumber } from './Vote'
+import { RunnerType } from 'types/runners'
 
 const DASH_LINE = '------------------------------------------'
 
@@ -17,20 +18,13 @@ export type Result = {
   result: VoteNumber
 }
 
-export interface RunnerType {
-  id: string
-  ids: string[] // hmm...
-  text: string
-  name: string
-}
-
 export interface RunnerProps {
   runner: RunnerType
   mode: 'view' | 'vote'
-  vote: Function
-  voted: boolean
-  isWinner: boolean
-  isLooser: boolean
+  vote?: () => any
+  voted?: boolean
+  isWinner?: boolean
+  isLooser?: boolean
 }
 
 const Runner: React.FC<RunnerProps> = props => {
@@ -60,7 +54,7 @@ const Runner: React.FC<RunnerProps> = props => {
 
     const loadHistory = () => {
       if (props.mode === 'view') {
-        fetch(`${getBackend()}/runner_history/${props.runner.id}`, {
+        fetch(`${backendPrefix}/runner_history/${props.runner.id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -142,7 +136,7 @@ const Runner: React.FC<RunnerProps> = props => {
         size="large"
         variant="contained"
         color="primary"
-        onClick={e => props.vote}
+        onClick={props.vote}
         style={{ fontWeight: 'bold' }}
         disabled={props.voted}
       >

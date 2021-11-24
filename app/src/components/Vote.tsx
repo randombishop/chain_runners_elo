@@ -2,7 +2,8 @@ import React from 'react'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 
-import Runner, { RunnerType } from './Runner'
+import Runner from './Runner'
+import { RunnerType } from 'types/runners'
 
 export type VoteNumber = 0 | 1 | 2
 
@@ -82,7 +83,8 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner1}
           mode="vote"
-          vote={() => props.vote(1, { status: 'ok' })}
+          // @ts-expect-error
+          vote={props.vote(1, { status: 'ok' })}
           voted={props.voted}
           isWinner={props.winner === 1}
           isLooser={props.winner === 2}

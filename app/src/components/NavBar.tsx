@@ -3,34 +3,31 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 
 import RollingImage from './RollingImage'
+import { PageType } from 'App'
+
+interface DeepStyleButtonProps {
+  navigate: NavbarProps['navigate']
+}
+
+const DeepStyleButton: React.FC<DeepStyleButtonProps> = props => {
+  return (
+    <React.Fragment>
+      <Button size="large" variant="contained" color="primary" onClick={props.navigate('style')}>
+        <span className="navbar-button">Style</span>
+      </Button>
+      &nbsp;&nbsp;&nbsp;
+    </React.Fragment>
+  )
+}
 
 export interface NavbarProps {
   address?: string
-  navigate: (...args: any[]) => any
+  navigate: (page: PageType) => any
   connect: (...args: any[]) => any
   ownedRunners: any // TODO: Type this
 }
 
 const NavBar: React.FC<NavbarProps> = props => {
-  // const connect = () => {}
-
-  const renderAddress = () => {
-    if (!props.address) return ''
-
-    return `${props.address.substr(0, 6)}...`
-  }
-
-  const renderDeepStyleButton = () => {
-    return (
-      <React.Fragment>
-        <Button size="large" variant="contained" color="primary" onClick={props.navigate('style')}>
-          <span className="navbar-button">Style</span>
-        </Button>
-        &nbsp;&nbsp;&nbsp;
-      </React.Fragment>
-    )
-  }
-
   return (
     <Grid container spacing={3} className="navbar-grid">
       <Grid item sm={12} lg={6} className="navbar-box">
@@ -53,16 +50,16 @@ const NavBar: React.FC<NavbarProps> = props => {
           <span className="navbar-button">Ranking</span>
         </Button>
         &nbsp;&nbsp;&nbsp;
-        {renderDeepStyleButton()}
+        {<DeepStyleButton navigate={props.navigate} />}
         <Button
           size="large"
           variant="contained"
           color="secondary"
           onClick={props.connect}
-          disabled={props.address !== null}
+          disabled={Boolean(props.address)}
         >
           <span className="navbar-button">
-            {props.address == null ? 'Connect' : renderAddress()}
+            {!props.address ? 'Connect' : `${props.address.slice(0, 6)}...`}
             &nbsp;
             <RollingImage data={props.ownedRunners} size={28} />
           </span>
