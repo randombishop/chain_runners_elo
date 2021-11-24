@@ -5,7 +5,11 @@ import Button from '@material-ui/core/Button'
 import Runner from './Runner'
 import { RunnerType } from 'types/runners'
 
-export type VoteNumber = 0 | 1 | 2
+export enum VoteNumber {
+  ZERO = 0,
+  ONE = 1,
+  TWO = 2,
+}
 
 export interface VoteProps {
   runner1: RunnerType

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { Component } from 'react'
 import { createTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
 import { green } from '@material-ui/core/colors'
@@ -30,226 +30,246 @@ const theme = createTheme({
 
 export type PageType = 'vote' | 'ranking' | 'style'
 
-interface PageContentProps {
+interface AppState {
   page: PageType
   ranking?: RunnerType[]
   lastUpdateTimestamp?: string
   runner1?: RunnerType
   runner2?: RunnerType
-  sendVote: (winner) => () => any
   voted: boolean
   winner: VoteNumber
-  pickRunners: () => any
+
+  address?: string
+  nonce: number
+  signature?: string
+  numOwnedRunners: number
+  ownedRunners: any[]
+  lookupOwners: boolean
+
+  isFirefox: boolean
 }
 
-const PageContent: React.FC<PageContentProps> = props => {
-  const { page, runner1, runner2, sendVote, voted, winner, pickRunners, ranking, lastUpdateTimestamp } = props
+class App extends Component<{}, AppState> {
+  private contractChainRunners?: ethers.Contract
+  private contractThe23?: ethers.Contract
+  private provider?: ethers.providers.Web3Provider
+  private signer?: ethers.providers.JsonRpcSigner
 
-  switch (page) {
-    case 'vote':
-      return !runner1 || !runner2 ? (
-        <React.Fragment></React.Fragment>
-      ) : (
-        <Vote
-          runner1={runner1}
-          runner2={runner2}
-          vote={sendVote}
-          voted={voted}
-          winner={winner}
-          next={pickRunners}
-        />
-      )
-    case 'ranking':
-      return <Ranking data={ranking} lastUpdateTimestamp={lastUpdateTimestamp} />
-    case 'style':
-      return <DeepStyle />
-    default:
-      return <React.Fragment></React.Fragment>
+  constructor(props) {
+    super(props)
+    this.state = {
+      page: 'vote',
+      ranking: undefined,
+      lastUpdateTimestamp: undefined,
+      runner1: undefined,
+      runner2: undefined,
+      voted: false,
+      winner: 0,
+
+      address: undefined,
+      nonce: Date.now(),
+      signature: undefined,
+      numOwnedRunners: 0,
+      ownedRunners: [],
+      lookupOwners: true,
+
+      isFirefox: false,
+    }
   }
-}
 
-let contractChainRunners: ethers.Contract | null
-let contractThe23: ethers.Contract | null
+  componentDidMount = () => {
+    this.checkFirefox()
+    this.loadRanking()
+    this.loadLastUpdateTimestamp()
+  }
 
-const App = () => {
-  const [page, setPage] = useState<PageType>('vote')
-  const [ranking, setRanking] = useState<RunnerType[] | undefined>(undefined)
-  const [lastUpdateTimestamp, setLastUpdateTimestamp] = useState<string | undefined>(undefined)
-  const [runner1, setRunner1] = useState<RunnerType | undefined>(undefined)
-  const [runner2, setRunner2] = useState<RunnerType | undefined>(undefined)
-  const [voted, setVoted] = useState(false)
-  const [winner, setWinner] = useState<VoteNumber>(0)
-  const [address, setAddress] = useState<string | null>(null)
-  const [nonce, setNonce] = useState(Date.now())
-  const [signature, setSignature] = useState<string | null>(null)
-  const [numOwnedRunners, setNumOwnedRunners] = useState(0)
-  const [ownedRunners, setOwnedRunners] = useState([]) // TODO: Type this
-  const [lookupOwners, setLookupOwners] = useState(true)
-  const [isFirefox, setIsFirefox] = useState(false)
-
-  // equivalent to componentDidMount
-  useEffect(() => {
-    setIsFirefox(navigator.userAgent.search('Firefox') > -1)
-
-    const receiveRanking = (result: RunnerType[]) => {
-      result.sort((a, b) => b.rating - a.rating)
-      let rank = 0
-      let currentRating: number | undefined = undefined
-
-      for (let i = 0; i < result.length; i++) {
-        if (currentRating === undefined || currentRating > result[i].rating) {
-          rank++
-        }
-        result[i].rank = rank
-        currentRating = result[i].rating
-      }
-      setRanking(result)
-
-      const { random1, random2 } = getRandomRunners(result)
-
-      setVoted(false)
-      setWinner(0)
-      setRunner1(result[random1])
-      setRunner2(result[random2])
+  checkFirefox = () => {
+    const f = navigator.userAgent.search('Firefox')
+    const state = {
+      isFirefox: f > -1,
     }
+    this.setState(state)
+  }
 
-    const loadRanking = () => {
-      fetch(`${backendPrefix}/ranking`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(result => {
-          receiveRanking(result)
+  connect = () => {
+    const state = {
+      address: undefined,
+      nonce: Date.now(),
+      signature: undefined,
+      numOwnedRunners: 0,
+      ownedRunners: [],
+      lookupOwners: true,
+    }
+    this.setState(state, this.doConnect)
+  }
+
+  doConnect = () => {
+    const self = this
+
+    // @ts-expect-error
+    this.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+    // @ts-expect-error
+    this.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+
+    this.provider.send('eth_requestAccounts', []).then(() => {
+      if (!self.provider) return
+
+      self.signer = self.provider.getSigner()
+      self.signer
+        .getAddress()
+        .then(address => {
+          self.contractChainRunners = new ethers.Contract(
+            CHAIN_RUNNERS_CONTRACT,
+            CHAIN_RUNNERS_ABI,
+            self.signer
+          )
+          self.contractThe23 = new ethers.Contract(THE23_CONTRACT, THE23_ABI, self.signer)
+          self.setState({ address: address }, self.oneTimeSignature)
         })
-        .catch(error => console.error('Error:', error))
-    }
-
-    const loadLastUpdateTimestamp = () => {
-      fetch(`${backendPrefix}/last_update_timestamp`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(result => {
-          setLastUpdateTimestamp(result)
+        .catch(error => {
+          console.error(error)
         })
-        .catch(error => console.error('Error:', error))
-    }
+    })
+  }
 
-    loadRanking()
-    loadLastUpdateTimestamp()
-  }, [])
+  oneTimeSignature = () => {
+    if (!this.signer) return
 
-  useEffect(() => {
-    if (address && lookupOwners && contractChainRunners) {
-      contractChainRunners
-        .tokenOfOwnerByIndex(address, numOwnedRunners)
+    const self = this
+    const message = `Hi, I'd like to login into datascience.art\nTimestamp: ${this.state.nonce}`
+
+    this.signer
+      .signMessage(message)
+      .then(signature => {
+        // checkNFTs doesn't seem to exist...
+        // self.setState({ signature: signature }, self.checkNFTs)
+        self.setState({ signature: signature })
+        self.loadOwnedRunners()
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
+
+  loadOwnedRunners = () => {
+    if (!this.state.lookupOwners || !this.contractChainRunners) return
+
+    const self = this
+
+    if (this.state.lookupOwners) {
+      this.contractChainRunners
+        .tokenOfOwnerByIndex(self.state.address, self.state.numOwnedRunners)
         .then(result => {
           result = parseInt(result)
           console.log('tokenOfOwnerByIndex returned ' + result)
-
-          setNumOwnedRunners(numOwnedRunners + 1)
-          setOwnedRunners(ownedRunners.concat(result))
+          const state = {
+            numOwnedRunners: self.state.numOwnedRunners + 1,
+            ownedRunners: self.state.ownedRunners.concat(result),
+          }
+          self.setState(state, self.loadOwnedRunners)
         })
         .catch(error => {
-          console.log('tokenOfOwnerByIndex returned none for address: ' + address)
-          debugger
-          setLookupOwners(false)
+          console.log('tokenOfOwnerByIndex returned none')
+          self.setState({ lookupOwners: false })
         })
     }
-  }, [address])
-
-  const oneTimeSignature = async (signer: ethers.providers.JsonRpcSigner) => {
-    const message = `Hi, I'd like to login into datascience.art\nTimestamp: ${nonce}`
-
-    const signature = await signer.signMessage(message)
-
-    setSignature(signature)
-
-    // checkNFTs() // this didn't exist?
-    // loadOwnedRunners()
   }
 
-  const doConnect = async () => {
-    const provider = new ethers.providers.Web3Provider(
-      // @ts-expect-error
-      window.ethereum,
-      'any'
-    )
-
-    await provider.send('eth_requestAccounts', [])
-
-    const signer = provider.getSigner()
-
-    contractChainRunners = new ethers.Contract(CHAIN_RUNNERS_CONTRACT, CHAIN_RUNNERS_ABI, signer)
-    contractThe23 = new ethers.Contract(THE23_CONTRACT, THE23_ABI, signer)
-
-    const address = await signer.getAddress()
-
-    console.log({ address })
-
-    setAddress(address)
-    await oneTimeSignature(signer)
+  loadRanking = () => {
+    const self = this
+    fetch(backendPrefix + '/ranking', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(result => {
+        self.receiveRanking(result)
+      })
+      .catch(error => {
+        console.error('Error:', error)
+      })
+  }
+  loadLastUpdateTimestamp = () => {
+    const self = this
+    fetch(backendPrefix + '/last_update_timestamp', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(result => {
+        self.setState({ lastUpdateTimestamp: result })
+      })
+      .catch(error => {
+        console.error('Error:', error)
+      })
   }
 
-  const connect = async () => {
-    // setAddress(null)
-    setNonce(Date.now())
-    // setSignature(null)
-    // setOwnedRunners([])
-    setLookupOwners(true)
+  receiveRanking = (result: RunnerType[]) => {
+    result.sort((a, b) => b.rating - a.rating)
 
-    await doConnect()
-  }
+    let rank = 0
+    let currentRating: number | null = null
 
-  const pickRunners = useCallback(() => {
-    if (!ranking) return
-
-    const { random1, random2 } = getRandomRunners(ranking)
-
-    setVoted(false)
-    setWinner(0)
-    setRunner1(ranking[random1])
-    setRunner2(ranking[random2])
-  }, [ranking])
-
-  const navigate = useCallback(
-    (page: PageType) => () => {
-      if (page === 'style' && !isFirefox) {
-        return alert('Sorry, this feature only works on Firefox.')
+    for (let i = 0; i < result.length; i++) {
+      if (currentRating === null || currentRating > result[i].rating) {
+        rank++
       }
-      setPage(page)
-    },
-    [isFirefox]
-  )
+      result[i].rank = rank
+      currentRating = result[i].rating
+    }
+    this.setState({ ranking: result }, this.pickRunners)
+  }
 
-  const sendVote = (winner: VoteNumber) => () => {
-    if (address === null || signature === null || nonce === null || numOwnedRunners === 0) {
-      debugger
-      return alert(
-        'Sorry, you can only vote after connecting your wallet, and you need to own at least one chain runner.'
-      )
+  pickRunners = () => {
+    if (this.state.ranking == null) return
+
+    const { random1, random2 } = getRandomRunners(this.state.ranking)
+
+    const state = {
+      voted: false,
+      winner: 0,
+      runner1: this.state.ranking[random1],
+      runner2: this.state.ranking[random2],
     }
 
-    if (!runner1 || !runner2) return console.error('Missing runner1 or runner2 data')
+    this.setState(state)
+  }
+
+  navigate = (page: PageType) => () => {
+    if (page === 'style' && !this.state.isFirefox) {
+      alert('Sorry, this feature only works on Firefox.')
+      return
+    }
+    this.setState({ page })
+  }
+
+  vote = (winner: VoteNumber) => () => {
+    if (!this.state.runner1 || !this.state.runner2) return
+
+    const self = this
+
+    const { address, nonce, signature, numOwnedRunners } = this.state
+
+    if (address == null || signature == null || nonce == null || numOwnedRunners === 0) {
+      alert(
+        'Sorry, you can only vote after connecting your wallet, and you need to own at least one chain runner.'
+      )
+      return
+    }
 
     const data = {
-      runner1: runner1.id,
-      runner2: runner2.id,
+      runner1: this.state.runner1.id,
+      runner2: this.state.runner2.id,
       result: winner,
       address,
       nonce,
       signature,
     }
-
-    debugger
-
-    fetch(`${backendPrefix}/submit_vote`, {
+    fetch(backendPrefix + '/submit_vote', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -258,36 +278,59 @@ const App = () => {
     })
       .then(response => response.json())
       .then(result => {
-        if (result.status === 'ok') {
-          setVoted(true)
-          setWinner(winner)
-        } else {
-          console.error(result.status)
-        }
+        self.voted(winner, result)
       })
-      .catch(error => console.error('Error:', error))
+      .catch(error => {
+        console.error('Error:', error)
+      })
   }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <div>
-        <NavBar navigate={navigate} address={address || ''} connect={connect} ownedRunners={ownedRunners} />
-        <Container style={{ marginTop: '25px' }}>
-          <PageContent
-            page={page}
-            runner1={runner1}
-            runner2={runner2}
-            sendVote={sendVote}
-            voted={voted}
-            winner={winner}
-            pickRunners={pickRunners}
-            ranking={ranking}
-            lastUpdateTimestamp={lastUpdateTimestamp}
-          />
-        </Container>
-      </div>
-    </ThemeProvider>
-  )
-}
+  voted = (winner: VoteNumber, result) => {
+    if (result.status === 'ok') {
+      this.setState({ voted: true, winner: winner })
+    } else {
+      console.error(result.status)
+    }
+  }
 
+  renderPage() {
+    switch (this.state.page) {
+      case 'vote':
+        return !this.state.runner1 || !this.state.runner2 ? (
+          <React.Fragment></React.Fragment>
+        ) : (
+          <Vote
+            runner1={this.state.runner1}
+            runner2={this.state.runner2}
+            vote={this.vote}
+            voted={this.state.voted}
+            winner={this.state.winner}
+            next={this.pickRunners}
+          />
+        )
+      case 'ranking':
+        return <Ranking data={this.state.ranking} lastUpdateTimestamp={this.state.lastUpdateTimestamp} />
+      case 'style':
+        return <DeepStyle />
+      default:
+        return ''
+    }
+  }
+
+  render() {
+    return (
+      <ThemeProvider theme={theme}>
+        <div>
+          <NavBar
+            navigate={this.navigate}
+            address={this.state.address}
+            connect={this.connect}
+            ownedRunners={this.state.ownedRunners}
+          />
+          <Container style={{ marginTop: '25px' }}>{this.renderPage()}</Container>
+        </div>
+      </ThemeProvider>
+    )
+  }
+}
 export default App
