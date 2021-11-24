@@ -9,7 +9,7 @@ import NavBar from './NavBar'
 import Vote from './Vote'
 import Ranking from './Ranking'
 import DeepStyle from './components/DeepStyle'
-import { getBackend, CHAIN_RUNNERS_CONTRACT, CHAIN_RUNNERS_ABI, THE23_CONTRACT, THE23_ABI } from './utils/utils'
+import { getBackend, CHAIN_RUNNERS_CONTRACT, CHAIN_RUNNERS_ABI, THE23_CONTRACT, THE23_ABI } from './utils'
 
 const theme = createTheme({
   typography: {

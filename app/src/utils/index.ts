@@ -1,6 +1,6 @@
 const isDev = process.env.NODE_ENV === 'development'
 
-function getBackend() {
+const getBackend = () => {
   return isDev ? 'http://localhost:3001' : ''
 }
 
