@@ -7,11 +7,7 @@ fastify.register(require("fastify-cors"), {});
 
 // Connect to Postgres
 const { Client } = require("pg");
-const client = new Client({
-  user: "postgres",
-  password: "Number24!",
-  database: "chainrunners",
-});
+const client = new Client();
 client.connect();
 
 // Signature verification
