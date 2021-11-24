@@ -5,9 +5,9 @@ import { green } from '@material-ui/core/colors'
 import Container from '@material-ui/core/Container'
 import { ethers } from 'ethers'
 
-import NavBar from './NavBar'
-import Vote from './Vote'
-import Ranking from './Ranking'
+import NavBar from './components/NavBar'
+import Vote from './components/Vote'
+import Ranking from './components/Ranking'
 import DeepStyle from './components/DeepStyle'
 import { getBackend, CHAIN_RUNNERS_CONTRACT, CHAIN_RUNNERS_ABI, THE23_CONTRACT, THE23_ABI } from './utils'
 
