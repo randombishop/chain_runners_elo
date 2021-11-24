@@ -285,9 +285,9 @@ class App extends Component<{}, AppState> {
       })
   }
 
-  voted = (winner: VoteNumber, result) => {
+  voted = (winner: VoteNumber, result: { status: string }) => {
     if (result.status === 'ok') {
-      this.setState({ voted: true, winner: winner })
+      this.setState({ voted: true, winner })
     } else {
       console.error(result.status)
     }
@@ -312,13 +312,10 @@ class App extends Component<{}, AppState> {
         return <Ranking data={this.state.ranking} lastUpdateTimestamp={this.state.lastUpdateTimestamp} />
       case 'style':
         return <DeepStyle />
-      default:
-        return ''
     }
   }
 
   render() {
-    console.log({ owned: this.state.ownedRunners })
     return (
       <ThemeProvider theme={theme}>
         <div>
