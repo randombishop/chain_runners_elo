@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { BASE_RUNNER_IMG_URL, EMPTY_IMG_URL } from './utils'
+import { BASE_RUNNER_IMG_URL, EMPTY_IMG_URL } from '../utils'
 
 const TIME_TO_ROLL = 1000
 

@@ -1,14 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 
-import Runner from './Runner'
+import Runner, { RunnerType } from './Runner'
 
-type VoteNumber = 0 | 1 | 2
+export type VoteNumber = 0 | 1 | 2
 
 export interface VoteProps {
-  runner1: string
-  runner2: string
+  runner1: RunnerType
+  runner2: RunnerType
   next: () => any
   vote: (vote: VoteNumber) => void
   voted: boolean
@@ -82,7 +82,7 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner1}
           mode="vote"
-          vote={props.vote(1)}
+          vote={() => props.vote(1)}
           voted={props.voted}
           isWinner={props.winner === 1}
           isLooser={props.winner === 2}
@@ -99,7 +99,7 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner2}
           mode="vote"
-          vote={props.vote(2)}
+          vote={() => props.vote(2)}
           voted={props.voted}
           isWinner={props.winner === 2}
           isLooser={props.winner === 1}

@@ -1,183 +1,164 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect, useState } from 'react'
 import Button from '@material-ui/core/Button'
 
 import RollingImage from './RollingImage'
 import { getBackend } from '../utils'
+import { VoteNumber } from './Vote'
 
 const DASH_LINE = '------------------------------------------'
 
-class Runner extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      tab: 'lore',
-      runner: null,
-      history: null,
-    }
-  }
+export type Tab = 'lore' | 'results'
 
-  componentDidMount = () => {
-    this.loadData()
-  }
+export type Result = {
+  runner1: any
+  runner2: any
+  address: any
+  time: any
+  result: VoteNumber
+}
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.runner !== this.props.runner) {
-      this.loadData()
-    }
-  }
+export interface RunnerType {
+  id: string
+  ids: string[] // hmm...
+  text: string
+  name: string
+}
 
-  loadData() {
-    this.loadRunner()
-    this.loadHistory()
-  }
+export interface RunnerProps {
+  runner: RunnerType
+  mode: 'view' | 'vote'
+  vote: Function
+  voted: boolean
+  isWinner: boolean
+  isLooser: boolean
+}
 
-  loadRunner = () => {
-    if (this.props.runner == null) {
-      return
-    }
-    let id = this.props.runner.id
-    let self = this
-    fetch('lore/' + id + '.json', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(result => {
-        self.loadRunner2(result)
-      })
-      .catch(error => {
-        alert('Error:', error)
-      })
-  }
+const Runner: React.FC<RunnerProps> = props => {
+  const [tab, setTab] = useState<Tab>('lore')
+  const [runner, setRunner] = useState<RunnerType | null>(null)
+  const [history, setHistory] = useState<Result[]>([]) // TODO: Type this
 
-  loadRunner2 = data => {
-    let state = {
-      runner: data,
-    }
-    this.setState(state)
-  }
+  // Equivalent of componentDidMount and componentDidUpdate
+  useEffect(() => {
+    if (props.runner === null) return
 
-  loadHistory = () => {
-    if (this.props.runner == null) {
-      return
-    }
-    if (this.props.mode === 'view') {
-      let id = this.props.runner.id
-      let self = this
-      fetch(getBackend() + '/runner_history/' + id, {
+    const loadRunner = () => {
+      fetch(`lore/${props.runner.id}.json`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       })
         .then(response => response.json())
-        .then(result => {
-          self.setState({ history: result })
+        .then((result: RunnerType) => {
+          setRunner(result)
         })
         .catch(error => {
-          alert('Error:', error)
+          console.error('Error:', error)
         })
     }
-  }
 
-  getTitle() {
-    if (this.state.runner) {
-      return '#' + this.state.runner.ids.join('+')
-    } else {
-      return 'Loading...'
+    const loadHistory = () => {
+      if (props.mode === 'view') {
+        fetch(`${getBackend()}/runner_history/${props.runner.id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(response => response.json())
+          .then(result => {
+            setHistory(result)
+          })
+          .catch(error => {
+            console.error('Error:', error)
+          })
+      }
     }
+    loadRunner()
+    loadHistory()
+  }, [props.mode, props.runner])
+
+  const getTitle = () => {
+    if (runner) return `#${runner.ids.join('+')}`
+    return 'Loading...'
   }
 
-  renderLore() {
-    return <span style={{ whiteSpace: 'pre-wrap' }}>{this.state.runner ? this.state.runner.text : ''}</span>
+  const renderLore = () => {
+    return <span style={{ whiteSpace: 'pre-wrap' }}>{runner ? runner.text : ''}</span>
   }
 
-  renderScore(result) {
-    if (result === 0) {
-      return '0 - 0'
-    } else if (result === 1) {
-      return '1 - 0'
-    } else if (result === 2) {
-      return '0 - 1'
-    } else {
-      return ''
-    }
+  const renderScore = (result: VoteNumber) => {
+    if (result === 0) return '0 - 0'
+    if (result === 1) return '1 - 0'
+    if (result === 2) return '0 - 1'
+    return ''
   }
 
-  renderVoteItem(i, result) {
+  const renderVoteItem = (i, result: Result) => {
     return (
       <div className="runner-panel-result" key={i}>
         {result.address} <br />
         {result.time} <br />
         {result.runner1} - {result.runner2}
         <br />
-        {this.renderScore(result.result)} <br />
+        {renderScore(result.result)} <br />
         {DASH_LINE}
       </div>
     )
   }
 
-  renderVoteLog() {
-    let ans = []
-    for (let i = 0; i < this.state.history.length; i++) {
-      ans.push(this.renderVoteItem(i, this.state.history[i]))
-    }
-    return ans
-  }
-  renderResults() {
-    if (this.state.history) {
-      return (
-        <React.Fragment>
-          <span className="my-green">
-            <b>Votes: {this.state.history.length}</b>
-          </span>
-          <br />
-          {DASH_LINE}
-          <br />
-          {this.renderVoteLog()}
-        </React.Fragment>
-      )
-    } else {
-      return ''
-    }
+  const renderResults = () => {
+    if (!history.length) return null
+
+    return (
+      <React.Fragment>
+        <span className="my-green">
+          <b>Votes: {history.length}</b>
+        </span>
+        <br />
+        {DASH_LINE}
+        <br />
+        {history.map((value, i) => renderVoteItem(i, value))}
+      </React.Fragment>
+    )
   }
 
-  renderBody() {
-    switch (this.state.tab) {
+  const renderBody = () => {
+    switch (tab) {
       case 'lore':
-        return this.renderLore()
+        return renderLore()
       case 'results':
-        return this.renderResults()
+        return renderResults()
       default:
         return ''
     }
   }
 
-  renderVotingButton() {
+  const renderVotingButton = () => {
+    if (!runner) return null
     return (
       <Button
         size="large"
         variant="contained"
         color="primary"
-        onClick={this.props.vote}
+        onClick={e => props.vote}
         style={{ fontWeight: 'bold' }}
-        disabled={this.props.voted}
+        disabled={props.voted}
       >
-        {this.state.runner.name} WINS!
+        {runner.name} WINS!
       </Button>
     )
   }
 
-  renderViewButtons() {
+  const renderViewButtons = () => {
     return (
       <React.Fragment>
         <Button
           size="large"
           variant="contained"
-          color={this.state.tab === 'lore' ? 'primary' : 'default'}
-          onClick={() => this.setState({ tab: 'lore' })}
+          color={tab === 'lore' ? 'primary' : 'default'}
+          onClick={() => setTab('lore')}
           style={{ fontWeight: 'bold' }}
         >
           Lore
@@ -186,8 +167,8 @@ class Runner extends Component {
         <Button
           size="large"
           variant="contained"
-          color={this.state.tab === 'results' ? 'primary' : 'default'}
-          onClick={() => this.setState({ tab: 'results' })}
+          color={tab === 'results' ? 'primary' : 'default'}
+          onClick={() => setTab('results')}
           style={{ fontWeight: 'bold' }}
         >
           Results
@@ -196,44 +177,40 @@ class Runner extends Component {
     )
   }
 
-  renderButtons() {
-    if (this.state.runner) {
-      switch (this.props.mode) {
-        case 'vote':
-          return this.renderVotingButton()
-        case 'view':
-          return this.renderViewButtons()
-        default:
-          return ''
-      }
-    } else {
-      return ''
+  const renderButtons = () => {
+    if (!runner) return null
+
+    switch (props.mode) {
+      case 'vote':
+        return renderVotingButton()
+      case 'view':
+        return renderViewButtons()
+      default:
+        return ''
     }
   }
 
-  additionalClass() {
-    if (this.props.isWinner) {
+  const additionalClass = () => {
+    if (props.isWinner) {
       return 'runner-panel-winner'
-    } else if (this.props.isLooser) {
+    } else if (props.isLooser) {
       return 'runner-panel-looser'
     } else {
       return 'runner-panel-draw'
     }
   }
 
-  render() {
-    return (
-      <div className={'runner-panel ' + this.additionalClass()}>
-        <div className="panel-title">{this.getTitle()}</div>
-        <div className="runner-panel-name">{this.state.runner ? this.state.runner.name : ''}</div>
-        <div className="runner-panel-avatar">
-          <RollingImage data={this.state.runner ? this.state.runner.ids : []} size={100} />
-        </div>
-        <div className="runner-panel-text">{this.renderBody()}</div>
-        <div className="runner-panel-action">{this.renderButtons()}</div>
+  return (
+    <div className={'runner-panel ' + additionalClass()}>
+      <div className="panel-title">{getTitle()}</div>
+      <div className="runner-panel-name">{runner ? runner.name : ''}</div>
+      <div className="runner-panel-avatar">
+        <RollingImage data={runner ? runner.ids : []} size={100} />
       </div>
-    )
-  }
+      <div className="runner-panel-text">{renderBody()}</div>
+      <div className="runner-panel-action">{renderButtons()}</div>
+    </div>
+  )
 }
 
 export default Runner
