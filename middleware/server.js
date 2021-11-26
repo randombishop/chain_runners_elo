@@ -58,7 +58,7 @@ fastify.get("/ranking", async (request, reply) => {
 
 // Return match history
 fastify.get("/runner_history/:runnerId", async (request, reply) => {
-  const q =
+  let q =
     "select v.address, v.time, r1.name as runner1, r2.name as runner2, v.result ";
   q += "from elo.vote as v ";
   q += "inner join elo.runner as r1 on r1.id=v.runner1  ";
@@ -98,6 +98,7 @@ fastify.post("/submit_vote", async (request, reply) => {
   const nonce = data.nonce;
   const signature = data.signature;
   const verified = verifySignature(address, nonce, signature);
+
   if (!verified) {
     reply.send({ status: "authentication error" });
   }
