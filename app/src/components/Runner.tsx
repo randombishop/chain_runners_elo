@@ -32,6 +32,16 @@ const getScore = (result: EVoteNumber) => {
   if (result === 2) return '0 - 1'
 }
 
+const safelyGetResults = (history?: Result[]) => {
+  try {
+    if (!history) return []
+    const results = history.map(x => x)
+    return results
+  } catch (err) {
+    return []
+  }
+}
+
 const VoteItem: React.FC<{ result: Result }> = props => {
   return (
     <div className="runner-panel-result">
@@ -46,17 +56,17 @@ const VoteItem: React.FC<{ result: Result }> = props => {
 }
 
 const Results: React.FC<{ history?: Result[] }> = props => {
-  if (!props.history) return null
+  const results = safelyGetResults(props.history)
 
   return (
     <React.Fragment>
       <span className="my-green">
-        <b>Votes: {props.history.length}</b>
+        <b>Votes: {results.length}</b>
       </span>
       <br />
       {DASH_LINE}
       <br />
-      {props.history.map((result, i) => (
+      {results.map((result, i) => (
         <VoteItem result={result} key={i} />
       ))}
     </React.Fragment>

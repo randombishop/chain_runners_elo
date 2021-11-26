@@ -1,12 +1,12 @@
 export interface IRunner {
-  id: string
-  ids: string[]
+  id: number
+  ids: number[]
   text: string
   name: string
 
   // Ranking...
   rank: number
-  nfts: string[]
+  nfts: number[]
   rating: number
   won: number
   draw: number

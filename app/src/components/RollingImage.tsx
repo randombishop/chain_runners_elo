@@ -6,7 +6,7 @@ const TIME_TO_ROLL = 1000
 
 interface RollingImageProps {
   size: number
-  data: number[] | string[]
+  data: number[]
 }
 
 interface RollingImageState {
