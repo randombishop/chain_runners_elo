@@ -15,6 +15,7 @@ yarn.lock
 
 # Runner images
 app/public/runners/*.png
+app/build/runners/*.png
 
 
 
