@@ -3,17 +3,17 @@ import Grid from '@material-ui/core/Grid'
 
 import RankingTable from './RankingTable'
 import Runner from './Runner'
-import { RunnerType } from 'types/runners'
+import { IRunner } from 'types'
 
 interface RankingProps {
-  data?: RunnerType[]
+  data?: IRunner[]
   lastUpdateTimestamp?: string
 }
 
 const Ranking: React.FC<RankingProps> = props => {
-  const [selectedRunner, setSelectedRunner] = useState<RunnerType | null>(null)
+  const [selectedRunner, setSelectedRunner] = useState<IRunner | null>(null)
 
-  const handleRunnerClicked = (runner: RunnerType) => () => {
+  const handleRunnerClicked = (runner: IRunner) => () => {
     setSelectedRunner(runner)
   }
 

@@ -3,31 +3,30 @@ import Button from '@material-ui/core/Button'
 
 import RollingImage from './RollingImage'
 import { backendPrefix } from '../utils'
-import { VoteNumber } from './Vote'
-import { RunnerType } from 'types/runners'
+import { EVoteNumber, IRunner } from 'types'
 
 const DASH_LINE = '------------------------------------------'
 
-export type Tab = 'lore' | 'results'
+type Tab = 'lore' | 'results'
 
-export type Result = {
+type Result = {
   runner1: number
   runner2: number
   address: string
   time: string
-  result: VoteNumber
+  result: EVoteNumber
 }
 
-export interface RunnerProps {
-  runner: RunnerType
+interface RunnerProps {
+  runner: IRunner
   mode: 'view' | 'vote'
-  vote?: () => any
+  vote?: () => void
   voted?: boolean
   isWinner?: boolean
   isLoser?: boolean
 }
 
-const getScore = (result: VoteNumber) => {
+const getScore = (result: EVoteNumber) => {
   if (result === 0) return '0 - 0'
   if (result === 1) return '1 - 0'
   if (result === 2) return '0 - 1'
@@ -46,8 +45,8 @@ const VoteItem: React.FC<{ result: Result }> = props => {
   )
 }
 
-const Results: React.FC<{ history: Result[] }> = props => {
-  if (!props.history.length) return null
+const Results: React.FC<{ history?: Result[] }> = props => {
+  if (!props.history) return null
 
   return (
     <React.Fragment>
@@ -64,13 +63,13 @@ const Results: React.FC<{ history: Result[] }> = props => {
   )
 }
 
-const Lore: React.FC<{ runner?: RunnerType }> = props => {
+const Lore: React.FC<{ runner?: IRunner }> = props => {
   return <span style={{ whiteSpace: 'pre-wrap' }}>{props.runner ? props.runner.text : ''}</span>
 }
 
 const Runner: React.FC<RunnerProps> = props => {
   const [tab, setTab] = useState<Tab>('lore')
-  const [runner, setRunner] = useState<RunnerType | undefined>(undefined)
+  const [runner, setRunner] = useState<IRunner | undefined>(undefined)
   const [history, setHistory] = useState<Result[]>([])
 
   // Equivalent of componentDidMount and componentDidUpdate
@@ -85,7 +84,7 @@ const Runner: React.FC<RunnerProps> = props => {
         },
       })
         .then(response => response.json())
-        .then((result: RunnerType) => {
+        .then((result: IRunner) => {
           setRunner(result)
         })
         .catch(error => {

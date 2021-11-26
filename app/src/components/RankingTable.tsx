@@ -4,7 +4,7 @@ import ArrowForward from '@material-ui/icons/ArrowForward'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 
 import RollingImage from './RollingImage'
-import { RunnerType } from 'types/runners'
+import { TRunnerClickedFn, IRunner } from 'types'
 
 const NUM_ITEMS_PER_PAGE = 10
 
@@ -40,8 +40,8 @@ const Buttons: React.FC<ButtonsProps> = props => {
 }
 
 interface ItemProps {
-  item: RunnerType
-  runnerClicked: RankingTableProps['runnerClicked']
+  item: IRunner
+  runnerClicked: TRunnerClickedFn
 }
 
 const Item: React.FC<ItemProps> = props => {
@@ -67,8 +67,8 @@ const Item: React.FC<ItemProps> = props => {
 }
 
 interface ItemListProps {
-  data?: RunnerType[]
-  runnerClicked: RankingTableProps['runnerClicked']
+  data?: IRunner[]
+  runnerClicked: TRunnerClickedFn
   page: number
 }
 
@@ -109,8 +109,8 @@ const ItemList: React.FC<ItemListProps> = props => {
 }
 
 interface RankingTableProps {
-  data?: RunnerType[]
-  runnerClicked: (runner: RunnerType) => any
+  data?: IRunner[]
+  runnerClicked: TRunnerClickedFn
   lastUpdateTimestamp?: string
 }
 

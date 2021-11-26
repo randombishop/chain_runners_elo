@@ -3,21 +3,15 @@ import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 
 import Runner from './Runner'
-import { RunnerType } from 'types/runners'
+import { EVoteNumber, IRunner, TVoteFn } from 'types'
 
-export enum VoteNumber {
-  ZERO = 0,
-  ONE = 1,
-  TWO = 2,
-}
-
-export interface VoteProps {
-  runner1: RunnerType
-  runner2: RunnerType
+interface VoteProps {
+  runner1: IRunner
+  runner2: IRunner
   next: () => any
-  vote: (vote: VoteNumber, result: { status: 'ok' | string }) => () => void
+  vote: TVoteFn
   voted: boolean
-  winner: VoteNumber
+  winner: EVoteNumber
 }
 
 const Vote: React.FC<VoteProps> = props => {
@@ -60,7 +54,7 @@ const Vote: React.FC<VoteProps> = props => {
             size="large"
             variant="contained"
             style={{ fontWeight: 'bold' }}
-            onClick={props.vote(VoteNumber.ZERO, { status: 'ok' })}
+            onClick={props.vote(EVoteNumber.ZERO)}
           >
             DRAW!
           </Button>
@@ -84,7 +78,7 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner1}
           mode="vote"
-          vote={props.vote(VoteNumber.ONE, { status: 'ok' })}
+          vote={props.vote(EVoteNumber.ONE)}
           voted={props.voted}
           isWinner={props.winner === 1}
           isLoser={props.winner === 2}
@@ -101,7 +95,7 @@ const Vote: React.FC<VoteProps> = props => {
         <Runner
           runner={props.runner2}
           mode="vote"
-          vote={props.vote(VoteNumber.TWO, { status: 'ok' })}
+          vote={props.vote(EVoteNumber.TWO)}
           voted={props.voted}
           isWinner={props.winner === 2}
           isLoser={props.winner === 1}

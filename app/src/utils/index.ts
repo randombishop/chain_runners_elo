@@ -1,10 +1,10 @@
-import { RunnerType } from 'types/runners'
+import { IRunner } from 'types'
 
-export const isDev = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development'
 
 export const backendPrefix = isDev ? 'http://localhost:3001' : ''
 
-export const getRandomRunners = (ranking: RunnerType[]) => {
+export const getRandomRunners = (ranking: IRunner[]) => {
   const MAX_OFFSET = 100
 
   const n = ranking.length

@@ -3,10 +3,10 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 
 import RollingImage from './RollingImage'
-import { PageType } from 'App'
+import { IAppState, TNavigateFn } from 'types'
 
 interface DeepStyleButtonProps {
-  navigate: NavbarProps['navigate']
+  navigate: TNavigateFn
 }
 
 const DeepStyleButton: React.FC<DeepStyleButtonProps> = props => {
@@ -20,11 +20,11 @@ const DeepStyleButton: React.FC<DeepStyleButtonProps> = props => {
   )
 }
 
-export interface NavbarProps {
+interface NavbarProps {
   address?: string
-  navigate: (page: PageType) => any
-  connect: (...args: any[]) => any
-  ownedRunners: any // TODO: Type this
+  connect: () => void
+  navigate: TNavigateFn
+  ownedRunners: IAppState['ownedRunners']
 }
 
 const NavBar: React.FC<NavbarProps> = props => {

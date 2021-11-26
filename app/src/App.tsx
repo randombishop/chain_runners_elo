@@ -6,7 +6,7 @@ import Container from '@material-ui/core/Container'
 import { ethers } from 'ethers'
 
 import NavBar from './components/NavBar'
-import Vote, { VoteNumber } from './components/Vote'
+import Vote from './components/Vote'
 import Ranking from './components/Ranking'
 import DeepStyle from './components/DeepStyle'
 import {
@@ -17,7 +17,7 @@ import {
   backendPrefix,
   getRandomRunners,
 } from './utils'
-import { RunnerType } from 'types/runners'
+import { IRunner, IAppState, TNavigateFn, TVoteFn, EVoteNumber, TConnectFn } from 'types'
 
 const theme = createTheme({
   typography: {
@@ -28,28 +28,7 @@ const theme = createTheme({
   },
 })
 
-export type PageType = 'vote' | 'ranking' | 'style'
-
-interface AppState {
-  page: PageType
-  ranking?: RunnerType[]
-  lastUpdateTimestamp?: string
-  runner1?: RunnerType
-  runner2?: RunnerType
-  voted: boolean
-  winner: VoteNumber
-
-  address?: string
-  nonce: number
-  signature?: string
-  numOwnedRunners: number
-  ownedRunners: number[]
-  lookupOwners: boolean
-
-  isFirefox: boolean
-}
-
-class App extends Component<{}, AppState> {
+class App extends Component<{}, IAppState> {
   private contractChainRunners?: ethers.Contract
   private contractThe23?: ethers.Contract
   private provider?: ethers.providers.Web3Provider
@@ -91,7 +70,7 @@ class App extends Component<{}, AppState> {
     this.setState(state)
   }
 
-  connect = () => {
+  connect: TConnectFn = () => {
     const state = {
       address: undefined,
       nonce: Date.now(),
@@ -124,7 +103,7 @@ class App extends Component<{}, AppState> {
             self.signer
           )
           self.contractThe23 = new ethers.Contract(THE23_CONTRACT, THE23_ABI, self.signer)
-          self.setState({ address: address }, self.oneTimeSignature)
+          self.setState({ address }, self.oneTimeSignature)
         })
         .catch(error => {
           console.error(error)
@@ -141,9 +120,7 @@ class App extends Component<{}, AppState> {
     this.signer
       .signMessage(message)
       .then(signature => {
-        // checkNFTs doesn't seem to exist...
-        // self.setState({ signature: signature }, self.checkNFTs)
-        self.setState({ signature: signature })
+        self.setState({ signature })
         self.loadOwnedRunners()
       })
       .catch(error => {
@@ -191,6 +168,7 @@ class App extends Component<{}, AppState> {
         console.error('Error:', error)
       })
   }
+
   loadLastUpdateTimestamp = () => {
     const self = this
     fetch(backendPrefix + '/last_update_timestamp', {
@@ -208,7 +186,7 @@ class App extends Component<{}, AppState> {
       })
   }
 
-  receiveRanking = (result: RunnerType[]) => {
+  receiveRanking = (result: IRunner[]) => {
     result.sort((a, b) => b.rating - a.rating)
 
     let rank = 0
@@ -239,7 +217,7 @@ class App extends Component<{}, AppState> {
     this.setState(state)
   }
 
-  navigate = (page: PageType) => () => {
+  navigate: TNavigateFn = page => () => {
     if (page === 'style' && !this.state.isFirefox) {
       alert('Sorry, this feature only works on Firefox.')
       return
@@ -247,7 +225,7 @@ class App extends Component<{}, AppState> {
     this.setState({ page })
   }
 
-  vote = (winner: VoteNumber) => () => {
+  vote: TVoteFn = winner => () => {
     if (!this.state.runner1 || !this.state.runner2) return
 
     const self = this
@@ -285,7 +263,7 @@ class App extends Component<{}, AppState> {
       })
   }
 
-  voted = (winner: VoteNumber, result: { status: string }) => {
+  voted = (winner: EVoteNumber, result: { status: string }) => {
     if (result.status === 'ok') {
       this.setState({ voted: true, winner })
     } else {
