@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid'
 
 import RankingTable from './RankingTable'
 import Runner from './Runner'
+import About from './About'
 import { IRunner } from 'types'
 
 interface RankingProps {
@@ -28,6 +29,9 @@ const Ranking: React.FC<RankingProps> = props => {
       </Grid>
       <Grid item lg={5} sm={12}>
         {selectedRunner ? <Runner runner={selectedRunner} mode="view" /> : ''}
+      </Grid>
+      <Grid item lg={12} sm={12}>
+        <About />
       </Grid>
     </Grid>
   )
