@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 
+import About from './About'
+
 import { BASE_RUNNER_IMG_URL } from '../utils'
 
 const STYLES = {
@@ -85,7 +87,7 @@ const DeepStyle: React.FC = () => {
 
   return (
     <Grid container spacing={1}>
-      <Grid item lg={4} sm={12}>
+      <Grid item lg={6} sm={12}>
         <div className="deep-style-panel">
           <div className="deep-style-panel-title">Runner</div>
           <div className="deep-style-panel-inputs">
@@ -113,7 +115,7 @@ const DeepStyle: React.FC = () => {
           </div>
         </div>
       </Grid>
-      <Grid item lg={4} sm={12}>
+      <Grid item lg={6} sm={12}>
         <div className="deep-style-panel">
           <div className="deep-style-panel-title">Style</div>
           <div className="deep-style-panel-inputs">
@@ -149,30 +151,8 @@ const DeepStyle: React.FC = () => {
           </div>
         </div>
       </Grid>
-      <Grid item lg={4} sm={12}>
-        <div className="about-panel">
-          <div className="about-panel-title">About</div>
-          <div className="about-panel-text">
-            If you'd like to support our work, please mint a piece of our collection at{' '}
-            <a target="blank" href="https://www.the23.wtf" className="my-green">
-              the23.wtf
-            </a>
-            <br />
-            <br />
-            It's a limited collection of 100 pieces of shit to record rug pulls, scams, and all kind of crazy
-            shit happening in Ethereum blockchain.
-            <br />
-            <br />
-            We're also working on a Pacman like network game where chain runners will run from Somnus and have
-            fun; and of course, holding pieces of shit will give the runners super poop powers.
-            <br />
-            <br />
-            Also, all runners are welcome to our{' '}
-            <a target="blank" href="https://discord.com/invite/CmVmWV8K7h" className="my-green">
-              discord server
-            </a>
-          </div>
-        </div>
+      <Grid item lg={12} sm={12}>
+        <About />
       </Grid>
     </Grid>
   )

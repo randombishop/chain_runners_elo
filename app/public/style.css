@@ -1,3 +1,7 @@
+body {
+    background-color: black
+}
+
 #root {
   position: absolute;
   left: 0;
@@ -69,15 +73,15 @@
 }
 
 .runner-panel-draw {
-  margin-top: 60px;
+  margin-top: 25px;
 }
 
 .runner-panel-winner {
-  margin-top: 30px;
+  margin-top: 5px;
 }
 
 .runner-panel-loser {
-  margin-top: 90px;
+  margin-top: 50px;
 }
 
 .runner-panel-name {
@@ -137,7 +141,7 @@
   background-size: 600px 700px;
   width: 600px;
   height: 700px;
-  margin-top: 50px;
+  margin-top: 25px;
   margin-inline: auto;
 }
 
@@ -206,7 +210,7 @@
   background-size: 340px 600px;
   width: 340px;
   height: 600px;
-  margin-top: 100px;
+  margin-top: 25px;
   margin-inline: auto;
 }
 
@@ -249,27 +253,19 @@
 
 .about-panel {
   position: relative;
-  background-image: url('panel4.png');
-  background-size: 340px 400px;
-  width: 340px;
-  height: 400px;
-  margin-top: 100px;
+  background-image: url('panel5.png');
+  background-size: 800px 125px;
+  width: 800px;
+  height: 125px;
+  margin-top: 25px;
   margin-inline: auto;
-}
-
-.about-panel-title {
-  position: absolute;
-  left: 20px;
-  top: 16px;
-  line-height: 25px;
-  font-size: xx-large;
-  font-weight: bold;
 }
 
 .about-panel-text {
   position: absolute;
   left: 20px;
-  top: 90px;
+  top: 20px;
   right: 20px;
-  bottom: 30px;
+  bottom: 20px;
+  font-size: 11px
 }
