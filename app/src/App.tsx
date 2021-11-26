@@ -5,11 +5,19 @@ import { green } from '@material-ui/core/colors'
 import Container from '@material-ui/core/Container'
 import { ethers } from 'ethers'
 
-import NavBar from './NavBar'
-import Vote from './Vote'
-import Ranking from './Ranking'
-import DeepStyle from './DeepStyle'
-import { getBackend, CHAIN_RUNNERS_CONTRACT, CHAIN_RUNNERS_ABI, THE23_CONTRACT, THE23_ABI } from './utils'
+import NavBar from './components/NavBar'
+import Vote from './components/Vote'
+import Ranking from './components/Ranking'
+import DeepStyle from './components/DeepStyle'
+import {
+  CHAIN_RUNNERS_CONTRACT,
+  CHAIN_RUNNERS_ABI,
+  THE23_CONTRACT,
+  THE23_ABI,
+  backendPrefix,
+  getRandomRunners,
+} from './utils'
+import { IRunner, IAppState, TNavigateFn, TVoteFn, EVoteNumber, TConnectFn } from 'types'
 
 const theme = createTheme({
   typography: {
@@ -20,23 +28,26 @@ const theme = createTheme({
   },
 })
 
-const MAX_OFFSET = 100
+class App extends Component<{}, IAppState> {
+  private contractChainRunners?: ethers.Contract
+  private contractThe23?: ethers.Contract
+  private provider?: ethers.providers.Web3Provider
+  private signer?: ethers.providers.JsonRpcSigner
 
-class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
       page: 'vote',
-      ranking: null,
-      lastUpdateTimestamp: null,
-      runner1: null,
-      runner2: null,
+      ranking: undefined,
+      lastUpdateTimestamp: undefined,
+      runner1: undefined,
+      runner2: undefined,
       voted: false,
       winner: 0,
 
-      address: null,
+      address: undefined,
       nonce: Date.now(),
-      signature: null,
+      signature: undefined,
       numOwnedRunners: 0,
       ownedRunners: [],
       lookupOwners: true,
@@ -52,18 +63,18 @@ class App extends Component {
   }
 
   checkFirefox = () => {
-    let f = navigator.userAgent.search('Firefox')
-    let state = {
+    const f = navigator.userAgent.search('Firefox')
+    const state = {
       isFirefox: f > -1,
     }
     this.setState(state)
   }
 
-  connect = () => {
-    let state = {
-      address: null,
+  connect: TConnectFn = () => {
+    const state = {
+      address: undefined,
       nonce: Date.now(),
-      signature: null,
+      signature: undefined,
       numOwnedRunners: 0,
       ownedRunners: [],
       lookupOwners: true,
@@ -72,9 +83,16 @@ class App extends Component {
   }
 
   doConnect = () => {
-    let self = this
-    self.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
-    self.provider.send('eth_requestAccounts', []).then(() => {
+    const self = this
+
+    // @ts-expect-error
+    this.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+    // @ts-expect-error
+    this.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+
+    this.provider.send('eth_requestAccounts', []).then(() => {
+      if (!self.provider) return
+
       self.signer = self.provider.getSigner()
       self.signer
         .getAddress()
@@ -85,7 +103,7 @@ class App extends Component {
             self.signer
           )
           self.contractThe23 = new ethers.Contract(THE23_CONTRACT, THE23_ABI, self.signer)
-          self.setState({ address: address }, self.oneTimeSignature)
+          self.setState({ address }, self.oneTimeSignature)
         })
         .catch(error => {
           console.error(error)
@@ -94,13 +112,15 @@ class App extends Component {
   }
 
   oneTimeSignature = () => {
-    let self = this
-    let message = "Hi, I'd like to login into datascience.art\n"
-    message += 'Timestamp: ' + this.state.nonce
-    self.signer
+    if (!this.signer) return
+
+    const self = this
+    const message = `Hi, I'd like to login into datascience.art\nTimestamp: ${this.state.nonce}`
+
+    this.signer
       .signMessage(message)
       .then(signature => {
-        self.setState({ signature: signature }, self.checkNFTs)
+        self.setState({ signature })
         self.loadOwnedRunners()
       })
       .catch(error => {
@@ -109,19 +129,19 @@ class App extends Component {
   }
 
   loadOwnedRunners = () => {
-    let self = this
-    if (self.state.lookupOwners) {
-      self.contractChainRunners
+    if (!this.state.lookupOwners || !this.contractChainRunners) return
+
+    const self = this
+
+    if (this.state.lookupOwners) {
+      this.contractChainRunners
         .tokenOfOwnerByIndex(self.state.address, self.state.numOwnedRunners)
         .then(result => {
           result = parseInt(result)
           console.log('tokenOfOwnerByIndex returned ' + result)
-          let numOwnedRunners = self.state.numOwnedRunners + 1
-          let ownedRunners = self.state.ownedRunners
-          ownedRunners.push(result)
-          let state = {
-            numOwnedRunners: numOwnedRunners,
-            ownedRunners: ownedRunners,
+          const state = {
+            numOwnedRunners: self.state.numOwnedRunners + 1,
+            ownedRunners: self.state.ownedRunners.concat(result),
           }
           self.setState(state, self.loadOwnedRunners)
         })
@@ -133,8 +153,8 @@ class App extends Component {
   }
 
   loadRanking = () => {
-    let self = this
-    fetch(getBackend() + '/ranking', {
+    const self = this
+    fetch(backendPrefix + '/ranking', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -148,9 +168,10 @@ class App extends Component {
         console.error('Error:', error)
       })
   }
+
   loadLastUpdateTimestamp = () => {
-    let self = this
-    fetch(getBackend() + '/last_update_timestamp', {
+    const self = this
+    fetch(backendPrefix + '/last_update_timestamp', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -165,12 +186,14 @@ class App extends Component {
       })
   }
 
-  receiveRanking = result => {
+  receiveRanking = (result: IRunner[]) => {
     result.sort((a, b) => b.rating - a.rating)
+
     let rank = 0
-    let currentRating = null
+    let currentRating: number | null = null
+
     for (let i = 0; i < result.length; i++) {
-      if (currentRating == null || currentRating > result[i].rating) {
+      if (currentRating === null || currentRating > result[i].rating) {
         rank++
       }
       result[i].rank = rank
@@ -180,41 +203,35 @@ class App extends Component {
   }
 
   pickRunners = () => {
-    if (this.state.ranking == null) {
-      return
-    }
-    let n = this.state.ranking.length
-    let random1 = Math.floor(Math.random() * n)
-    let direction = Math.random() > 0.5 ? 1 : -1
-    let offset = Math.floor(Math.random() * MAX_OFFSET)
-    let random2 = random1 + direction * offset
-    random2 = Math.abs(random2) % n
-    if (random1 === random2) {
-      random2 = (random1 + direction) % n
-    }
-    let state = {
+    if (this.state.ranking == null) return
+
+    const { random1, random2 } = getRandomRunners(this.state.ranking)
+
+    const state = {
       voted: false,
       winner: 0,
       runner1: this.state.ranking[random1],
       runner2: this.state.ranking[random2],
     }
+
     this.setState(state)
   }
 
-  navigate = page => () => {
+  navigate: TNavigateFn = page => () => {
     if (page === 'style' && !this.state.isFirefox) {
       alert('Sorry, this feature only works on Firefox.')
       return
     }
-    this.setState({ page: page })
+    this.setState({ page })
   }
 
-  vote = winner => () => {
-    let self = this
-    let address = this.state.address
-    let nonce = this.state.nonce
-    let signature = this.state.signature
-    let numOwnedRunners = this.state.numOwnedRunners
+  vote: TVoteFn = winner => () => {
+    if (!this.state.runner1 || !this.state.runner2) return
+
+    const self = this
+
+    const { address, nonce, signature, numOwnedRunners } = this.state
+
     if (address == null || signature == null || nonce == null || numOwnedRunners === 0) {
       alert(
         'Sorry, you can only vote after connecting your wallet, and you need to own at least one chain runner.'
@@ -222,15 +239,15 @@ class App extends Component {
       return
     }
 
-    let data = {
+    const data = {
       runner1: this.state.runner1.id,
       runner2: this.state.runner2.id,
       result: winner,
-      address: address,
-      nonce: nonce,
-      signature: signature,
+      address,
+      nonce,
+      signature,
     }
-    fetch(getBackend() + '/submit_vote', {
+    fetch(backendPrefix + '/submit_vote', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -246,9 +263,9 @@ class App extends Component {
       })
   }
 
-  voted = (winner, result) => {
+  voted = (winner: EVoteNumber, result: { status: string }) => {
     if (result.status === 'ok') {
-      this.setState({ voted: true, winner: winner })
+      this.setState({ voted: true, winner })
     } else {
       console.error(result.status)
     }
@@ -257,7 +274,9 @@ class App extends Component {
   renderPage() {
     switch (this.state.page) {
       case 'vote':
-        return (
+        return !this.state.runner1 || !this.state.runner2 ? (
+          <React.Fragment></React.Fragment>
+        ) : (
           <Vote
             runner1={this.state.runner1}
             runner2={this.state.runner2}
@@ -271,8 +290,6 @@ class App extends Component {
         return <Ranking data={this.state.ranking} lastUpdateTimestamp={this.state.lastUpdateTimestamp} />
       case 'style':
         return <DeepStyle />
-      default:
-        return ''
     }
   }
 
@@ -285,7 +302,6 @@ class App extends Component {
             address={this.state.address}
             connect={this.connect}
             ownedRunners={this.state.ownedRunners}
-            isFirefox={this.state.isFirefox}
           />
           <Container style={{ marginTop: '25px' }}>{this.renderPage()}</Container>
         </div>
