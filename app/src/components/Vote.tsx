@@ -60,10 +60,7 @@ const Vote: React.FC<VoteProps> = props => {
             size="large"
             variant="contained"
             style={{ fontWeight: 'bold' }}
-            onClick={e => {
-              e.preventDefault()
-              props.vote(VoteNumber.ZERO, { status: 'ok' })
-            }}
+            onClick={props.vote(VoteNumber.ZERO, { status: 'ok' })}
           >
             DRAW!
           </Button>
