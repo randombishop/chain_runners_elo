@@ -1,15 +1,30 @@
+import { IRunner } from 'types'
+
 const isDev = process.env.NODE_ENV === 'development'
 
-function getBackend() {
-  return isDev ? 'http://localhost:3001' : ''
+export const backendPrefix = isDev ? 'http://localhost:3001' : ''
+
+export const getRandomRunners = (ranking: IRunner[]) => {
+  const MAX_OFFSET = 100
+
+  const n = ranking.length
+  const random1 = Math.floor(Math.random() * n)
+  const direction = Math.random() > 0.5 ? 1 : -1
+  const offset = Math.floor(Math.random() * MAX_OFFSET)
+  let random2 = Math.abs(random1 + direction * offset) % n
+
+  if (random1 === random2) {
+    random2 = (random1 + direction) % n
+  }
+  return { random1, random2 }
 }
 
-const BASE_RUNNER_IMG_URL = 'runners/'
+export const BASE_RUNNER_IMG_URL = 'runners/'
 
-const EMPTY_IMG_URL = 'empty.png'
+export const EMPTY_IMG_URL = 'empty.png'
 
-const CHAIN_RUNNERS_CONTRACT = '0x97597002980134beA46250Aa0510C9B90d87A587'
-const CHAIN_RUNNERS_ABI = [
+export const CHAIN_RUNNERS_CONTRACT = '0x97597002980134beA46250Aa0510C9B90d87A587'
+export const CHAIN_RUNNERS_ABI = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   {
     anonymous: false,
@@ -394,8 +409,8 @@ const CHAIN_RUNNERS_ABI = [
   { stateMutability: 'payable', type: 'receive' },
 ]
 
-const THE23_CONTRACT = '0x6A2571dA2307818c293912A71393203549ab5A0c'
-const THE23_ABI = [
+export const THE23_CONTRACT = '0x6A2571dA2307818c293912A71393203549ab5A0c'
+export const THE23_ABI = [
   {
     inputs: [{ internalType: 'address', name: '_proxyRegistryAddress', type: 'address' }],
     stateMutability: 'nonpayable',
@@ -681,15 +696,4 @@ const THE23_ABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-]
-
-export {
-  isDev,
-  getBackend,
-  BASE_RUNNER_IMG_URL,
-  EMPTY_IMG_URL,
-  CHAIN_RUNNERS_CONTRACT,
-  CHAIN_RUNNERS_ABI,
-  THE23_CONTRACT,
-  THE23_ABI,
-}
+] as const

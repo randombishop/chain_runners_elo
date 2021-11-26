@@ -10,7 +10,7 @@
 # Node libs and package lock files
 node_modules
 package-lock.json
-yarn.json
+yarn.lock
 
 # Runner images
 app/public/runners/*.png
